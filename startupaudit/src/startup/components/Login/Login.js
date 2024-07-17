@@ -3,8 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "font-awesome/css/font-awesome.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import { toast } from "react-toastify";
 import "./login.css";
-import logo from "../../images/logo.png";
+import logo from "../images/logo.png";
+import * as API from "../../Endpoints/Endpoints";
+
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,22 +15,27 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await fetch("http://localhost:5009/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        // Save token in local storage or context
-        localStorage.setItem("token", data.token);
-        navigate("/home");
-      } else {
-        alert("Login failed: " + data);
+    if (!email || !password) {
+      toast.error("Please enter your login credentials");
+    } else {
+      try {
+        const response = await fetch(API.LOGIN, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          // Save token in local storage or context
+          localStorage.setItem("token", data.token);
+          toast.success("Login successful!");
+          navigate("/home");
+        } else {
+          toast.error("Login failed: " + data.message);
+        }
+      } catch (err) {
+        toast.error("Error: " + err.message);
       }
-    } catch (err) {
-      console.error("Error:", err);
     }
   };
 
@@ -69,10 +77,10 @@ function Login() {
 
                     <div className="input-group center">
                       <button
-                        className="btn  btn-round btn-signup"
+                        className="btn btn-round btn-signup"
                         type="submit"
                       >
-                        SIGN IN
+                        LOG IN
                       </button>
                     </div>
                     <div className="row">
@@ -90,7 +98,7 @@ function Login() {
                 <div className="inn-cover">
                   <div className="ditk-inf">
                     <div className="small-logo"></div>
-                    <h2 className="w-100">Didn't Have an Account </h2>
+                    <h2 className="w-100">Didn't Have an Account</h2>
                     <p>
                       Explore our platform and create your profile today to
                       access exclusive features and personalized services

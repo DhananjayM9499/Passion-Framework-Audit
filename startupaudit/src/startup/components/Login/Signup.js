@@ -1,82 +1,12 @@
-// import React, { useState } from "react";
-// import { Link, useNavigate } from "react-router-dom";
-
-// function Signup() {
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const [confirmPassword, setConfirmPassword] = useState("");
-//   const history = useNavigate();
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     if (password !== confirmPassword) {
-//       alert("Passwords do not match");
-//       return;
-//     }
-//     try {
-//       const response = await fetch("http://localhost:5009/signup", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ email, password }),
-//       });
-//       if (response.ok) {
-//         history("/login");
-//       } else {
-//         const data = await response.json();
-//         alert("Signup failed: " + data);
-//       }
-//     } catch (err) {
-//       console.error("Error:", err);
-//     }
-//   };
-
-//   return (
-//     <div className="signup-container">
-//       <h2>Sign Up</h2>
-//       <form onSubmit={handleSubmit}>
-//         <div>
-//           <label>Email:</label>
-//           <input
-//             type="email"
-//             value={email}
-//             onChange={(e) => setEmail(e.target.value)}
-//             required
-//           />
-//         </div>
-//         <div>
-//           <label>Password:</label>
-//           <input
-//             type="password"
-//             value={password}
-//             onChange={(e) => setPassword(e.target.value)}
-//             required
-//           />
-//         </div>
-//         <div>
-//           <label>Confirm Password:</label>
-//           <input
-//             type="password"
-//             value={confirmPassword}
-//             onChange={(e) => setConfirmPassword(e.target.value)}
-//             required
-//           />
-//         </div>
-//         <button type="submit">Sign Up</button>
-//       </form>
-//       <p>
-//         Already have an account? <Link to="/login">Log in</Link>
-//       </p>
-//     </div>
-//   );
-// }
-
-// export default Signup;
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "font-awesome/css/font-awesome.min.css";
 import "./login.css";
-import logo from "../../images/logo.png";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import logo from "../images/logo.png";
+import * as API from "../../Endpoints/Endpoints";
 
 function Signup() {
   const [email, setEmail] = useState("");
@@ -86,24 +16,29 @@ function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
-    try {
-      const response = await fetch("http://localhost:5009/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        navigate("/login");
-      } else {
-        alert("Signup failed: " + data);
+    if (!email || !password || !confirmPassword) {
+      toast.error("Please fill all the fields");
+    } else {
+      if (password !== confirmPassword) {
+        toast.error("Passwords do not match");
+        return;
       }
-    } catch (err) {
-      console.error("Error:", err);
+      try {
+        const response = await fetch(API.SIGNUP, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          toast.success("Signup successful! Please log in.");
+          navigate("/login");
+        } else {
+          toast.error("Signup failed: " + data.message);
+        }
+      } catch (err) {
+        toast.error("Error: " + err.message);
+      }
     }
   };
 

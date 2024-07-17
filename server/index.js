@@ -27,7 +27,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // Signup Endpoint
-app.post("/signup", async (req, res) => {
+app.post("/startup-api/signup", async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -61,7 +61,7 @@ app.post("/signup", async (req, res) => {
 const secretKey = "g63D0b5E4&fU^E#^q2tE8j5#4Z3Kp7@1"; // Replace with your actual secret key
 
 // Login Endpoint
-app.post("/login", async (req, res) => {
+app.post("/startup-api/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -82,9 +82,11 @@ app.post("/login", async (req, res) => {
     }
 
     // Generate JWT token
-    const token = jwt.sign({ userId: result.rows[0].user_id }, secretKey, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { userId: result.rows[0].user_id, email: result.rows[0].user_email },
+      secretKey,
+      { expiresIn: "1h" }
+    );
 
     res.status(200).json({ token });
   } catch (err) {
@@ -93,6 +95,114 @@ app.post("/login", async (req, res) => {
   }
 });
 
+/****************OrganizationApi******************** */
+
+/*GET ALL Organization */
+app.get("/startup-api/organization", (req, res) => {
+  const sqlGet = "SELECT * FROM public.organization";
+  pool.query(sqlGet, (error, result) => {
+    if (error) {
+      console.error("Error executing query:", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res.json(result.rows);
+    }
+  });
+});
+
+/*DELETE ORGANIZATION*/
+app.delete("/startup-api/organization/:organizationid", (req, res) => {
+  const { organizationid } = req.params;
+  const sqlCheckPhase =
+    "SELECT COUNT(*) AS organizationCount FROM public.organization WHERE organizationid = $1";
+  const sqlRemove = "DELETE FROM public.organization WHERE organizationid = $1";
+
+  db.query(sqlCheckPhase, [organizationid], (error, result) => {
+    if (error) {
+      console.error(error);
+      return res
+        .status(500)
+        .send("An error occurred while checking Organization.");
+    }
+
+    const organizationCount = result.rows[0].organizationCount;
+
+    if (organizationCount > 0) {
+      return res
+        .status(400)
+        .send("Cannot delete Organization with associates.");
+    }
+
+    db.query(sqlRemove, [organizationid], (error, result) => {
+      if (error) {
+        console.error(error);
+        return res
+          .status(500)
+          .send("An error occurred while deleting Organization.");
+      }
+
+      res.send("Organization deleted successfully.");
+    });
+  });
+});
+
+/**SPECIFIC ORGANIZATION */
+
+app.get("/startup-api/organization/:organizationid", async (req, res) => {
+  try {
+    const { organizationid } = req.params;
+    const sqlGet =
+      "SELECT * FROM public.organization WHERE organizationid = $1";
+
+    const result = await db.query(sqlGet, [organizationid]);
+
+    res.send(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while fetching the Organization.");
+  }
+});
+
+app.post("/startup-api/organization", (req, res) => {
+  const { organization, contactname, contactemail, contactphone } = req.body;
+  const sqlInsert =
+    "INSERT INTO public.organization(organization, contactname, contactemail, contactphone) VALUES ($1, $2, $3, $4)";
+  const values = [organization, contactname, contactemail, contactphone];
+
+  pool.query(sqlInsert, values, (error, result) => {
+    if (error) {
+      console.error("Error inserting Organization:", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res.status(200).json({ message: "Organization inserted successfully" });
+    }
+  });
+});
+
+//for editing the Organization
+app.put("/startup-api/organization/:organizationid", (req, res) => {
+  const { organizationid } = req.params;
+  const { organization, contactname, contactemail, contactphone } = req.body;
+  const sqlUpdate =
+    "UPDATE public.organizationSET organization=$1,contactname=$2,contactemail=$3,contactphone=$4 WHERE organizationid = $5";
+
+  pool.query(
+    sqlUpdate,
+    [organization, contactname, contactemail, contactphone, organizationid],
+    (error, result) => {
+      if (error) {
+        console.error(error);
+        return res
+          .status(500)
+          .send("An error occurred while updating the Organization.");
+      }
+
+      res.send("Organizationupdated successfully.");
+    }
+  );
+});
+
+/************************************************* */
 // Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

@@ -1,0 +1,55 @@
+.form-container {
+  font-family: "Poppins", sans-serif;
+  margin: auto;
+  padding: 15px;
+  max-width: 50%;
+  align-content: center;
+  width: 100%; /* Ensures the form container takes full width */
+  box-sizing: border-box; /* Ensures padding and border are included in width */
+}
+
+.form-container h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  margin-top: 3cm;
+  color: black;
+}
+
+.form-container form {
+  font-family: "Poppins", sans-serif;
+  margin: auto;
+  padding: 15px;
+  max-width: 400px;
+  align-content: center;
+  width: 100%; /* Ensures the form takes full width */
+  box-sizing: border-box; /* Ensures padding and border are included in width */
+  background-color: #f8f8f8;
+  margin-bottom: 20px;
+  border-radius: 50px;
+}
+
+.form-container label {
+  margin: 10px 0 5px;
+  font-weight: 500;
+  color: black;
+}
+
+.form-container input[type="text"] {
+  width: calc(100% - 20px); /* Adjusts input width to account for padding */
+  padding: 10px;
+  margin: 5px 0 20px;
+  border: 1px solid #ccc;
+  border-radius: 50px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .form-container {
+    padding: 10px;
+    max-width: 100%; /* Ensures the form container stretches to full width on smaller screens */
+  }
+
+  .form-container form {
+    padding: 10px;
+  }
+}

@@ -13,6 +13,12 @@ export const SidebarData = [
     cName: "nav-text",
   },
   {
+    title: " Organization",
+    path: "/organization",
+    icon: <FaIcons.FaWarehouse />,
+    cName: "nav-text",
+  },
+  {
     title: " State",
     path: "/state",
     icon: <IoLocationSharp />,
@@ -22,12 +28,6 @@ export const SidebarData = [
     title: " City",
     path: "/city",
     icon: <FaCity />,
-    cName: "nav-text",
-  },
-  {
-    title: " Warehouse",
-    path: "/warehouse",
-    icon: <FaIcons.FaWarehouse />,
     cName: "nav-text",
   },
 ];

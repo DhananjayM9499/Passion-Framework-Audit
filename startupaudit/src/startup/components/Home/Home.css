@@ -1,0 +1,74 @@
+/* Home.css */
+
+/* Base styles */
+.home {
+  text-align: center;
+  margin-top: 50px;
+  padding: 20px;
+  vertical-align: middle;
+}
+
+.home-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.home-image {
+  margin-top: 5px;
+  width: 300px;
+  height: auto;
+}
+
+.home-icon {
+  width: 100px;
+  height: auto;
+}
+
+.welcome-message {
+  margin-top: 2rem; /* Adjust margin for proper spacing */
+  color: #333;
+  font-size: 2rem; /* Set initial font size */
+  vertical-align: middle;
+}
+
+/* Styles for tablets and larger devices */
+@media (min-width: 768px) {
+  .home {
+    margin-top: 70px;
+  }
+
+  .welcome-message {
+    margin-top: 3rem; /* Adjust margin for tablets */
+    font-size: 2.5rem; /* Increase font size for tablets */
+  }
+
+  .home-image {
+    width: 400px;
+  }
+
+  .home-icon {
+    width: 150px;
+  }
+}
+
+/* Styles for desktops and larger devices */
+@media (min-width: 1024px) {
+  .home {
+    margin-top: 100px;
+  }
+
+  .welcome-message {
+    margin-top: 4rem; /* Adjust margin for desktops */
+    font-size: 3rem; /* Increase font size for desktops */
+  }
+
+  .home-image {
+    width: 500px;
+  }
+
+  .home-icon {
+    width: 200px;
+  }
+}
