@@ -13,11 +13,12 @@ const initialState = {
   contactphone: "",
 };
 
-const AddEdit = () => {
+const AddEditOrganization = () => {
   const [state, setState] = useState(initialState);
   const { organization, contactname, contactemail, contactphone } = state;
   const navigate = useNavigate();
   const { organizationid } = useParams();
+  const userId = localStorage.getItem("user_id");
 
   useEffect(() => {
     if (organizationid) {
@@ -51,6 +52,7 @@ const AddEdit = () => {
             contactname,
             contactemail,
             contactphone,
+            userId,
           })
           .then(() => {
             setState(initialState);
@@ -60,7 +62,7 @@ const AddEdit = () => {
           .catch((err) => toast.error(err.response.data));
       } else {
         axios
-          .put(API.PUT_SPECIFIC_ORGANIZATION(organizationid), {
+          .put(API.UPDATE_SPECIFIC_ORGANIZATION(organizationid), {
             organization,
             contactname,
             contactemail,
@@ -136,4 +138,4 @@ const AddEdit = () => {
   );
 };
 
-export default AddEdit;
+export default AddEditOrganization;

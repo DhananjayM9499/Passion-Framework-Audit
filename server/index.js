@@ -98,9 +98,10 @@ app.post("/startup-api/login", async (req, res) => {
 /****************OrganizationApi******************** */
 
 /*GET ALL Organization */
-app.get("/startup-api/organization", (req, res) => {
-  const sqlGet = "SELECT * FROM public.organization";
-  pool.query(sqlGet, (error, result) => {
+app.get("/startup-api/organization/:user_id", (req, res) => {
+  const { user_id } = req.params;
+  const sqlGet = "SELECT * FROM public.organization where user_id=$1";
+  pool.query(sqlGet, [user_id], (error, result) => {
     if (error) {
       console.error("Error executing query:", error);
       res.status(500).json({ error: "Internal server error" });
@@ -117,7 +118,7 @@ app.delete("/startup-api/organization/:organizationid", (req, res) => {
     "SELECT COUNT(*) AS organizationCount FROM public.organization WHERE organizationid = $1";
   const sqlRemove = "DELETE FROM public.organization WHERE organizationid = $1";
 
-  db.query(sqlCheckPhase, [organizationid], (error, result) => {
+  pool.query(sqlCheckPhase, [organizationid], (error, result) => {
     if (error) {
       console.error(error);
       return res
@@ -133,7 +134,7 @@ app.delete("/startup-api/organization/:organizationid", (req, res) => {
         .send("Cannot delete Organization with associates.");
     }
 
-    db.query(sqlRemove, [organizationid], (error, result) => {
+    pool.query(sqlRemove, [organizationid], (error, result) => {
       if (error) {
         console.error(error);
         return res
@@ -154,7 +155,7 @@ app.get("/startup-api/organization/:organizationid", async (req, res) => {
     const sqlGet =
       "SELECT * FROM public.organization WHERE organizationid = $1";
 
-    const result = await db.query(sqlGet, [organizationid]);
+    const result = await pool.query(sqlGet, [organizationid]);
 
     res.send(result.rows);
   } catch (error) {
@@ -164,10 +165,17 @@ app.get("/startup-api/organization/:organizationid", async (req, res) => {
 });
 
 app.post("/startup-api/organization", (req, res) => {
-  const { organization, contactname, contactemail, contactphone } = req.body;
+  const { organization, contactname, contactemail, contactphone, userId } =
+    req.body;
   const sqlInsert =
-    "INSERT INTO public.organization(organization, contactname, contactemail, contactphone) VALUES ($1, $2, $3, $4)";
-  const values = [organization, contactname, contactemail, contactphone];
+    "INSERT INTO public.organization(organization, contactname, contactemail, contactphone,user_id) VALUES ($1, $2, $3, $4,$5)";
+  const values = [
+    organization,
+    contactname,
+    contactemail,
+    contactphone,
+    userId,
+  ];
 
   pool.query(sqlInsert, values, (error, result) => {
     if (error) {
@@ -184,7 +192,7 @@ app.put("/startup-api/organization/:organizationid", (req, res) => {
   const { organizationid } = req.params;
   const { organization, contactname, contactemail, contactphone } = req.body;
   const sqlUpdate =
-    "UPDATE public.organizationSET organization=$1,contactname=$2,contactemail=$3,contactphone=$4 WHERE organizationid = $5";
+    "UPDATE public.organization SET organization=$1,contactname=$2,contactemail=$3,contactphone=$4 WHERE organizationid = $5";
 
   pool.query(
     sqlUpdate,
@@ -201,8 +209,73 @@ app.put("/startup-api/organization/:organizationid", (req, res) => {
     }
   );
 });
+/********************************************************Environment API**************************************************** */
+//GET Environment API
+app.get("/startup-api/environment", (req, res) => {
+  const sqlGet = "SELECT * from public.environment";
+  pool.query(sqlGet, (error, result) => {
+    res.json(result.rows);
+  });
+});
+//ADD Environment API
+app.post("/startup-api/environment", (req, res) => {
+  const { environmentname, environmentdescription } = req.body;
+  const sqlInsert =
+    "INSERT INTO public.environment(environmentname,environmentdescription) values($1 ,$2)";
+  const values = [environmentname, environmentdescription];
+  pool.query(sqlInsert, values, (error, result) => {
+    if (error) {
+      console.error("error intersting ", error);
+      res.status(500).json({ error: "internal server error" });
+    } else {
+      res.status(200).json({ message: " Environment Inserted sucessfully" });
+    }
+  });
+});
+//Delete Environment API
+app.delete("/startup-api/environment/:environmentid", (req, res) => {
+  const { environmentid } = req.params;
+  const sqlRemove = "Delete from public.environment where environmentid=$1";
+  pool.query(sqlRemove, [environmentid], (error, result) => {
+    if (error) {
+      console.log(error);
+      return res.status(500).send("an error occurred while deleting ");
+    }
+    res.send("Environment deleted successfully");
+  });
+});
+//Specific Environment API
+app.get("/startup-api/environment/:environmentid", async (req, res) => {
+  try {
+    const { environmentid } = req.params;
+    const sqlGet = "SELECT * FROM public.environment WHERE environmentid=$1";
+    const result = await pool.query(sqlGet, [environmentid]);
+    res.send(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("an error occurred while fectching ");
+  }
+});
+//Update Environment API
+app.put("/startup-api/environment/:environmentid", (req, res) => {
+  const { environmentid } = req.params;
+  const { environmentname, environmentdescription } = req.body;
 
-/************************************************* */
+  const sqlUpdate =
+    "UPDATE public.environment SET environmentname=$1, environmentdescription=$2 WHERE environmentid=$3";
+  pool.query(
+    sqlUpdate,
+    [environmentname, environmentdescription, environmentid],
+    (error, result) => {
+      if (error) {
+        console.error("Error updating Environment", error);
+        return res.status(500).send("An error occurred while updating");
+      }
+      res.send("Updated successfully");
+    }
+  );
+});
+/************************************************************************************************************************ */
 // Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

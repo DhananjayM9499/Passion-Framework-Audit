@@ -27,7 +27,9 @@ function Login() {
         const data = await response.json();
         if (response.ok) {
           // Save token in local storage or context
+
           localStorage.setItem("token", data.token);
+
           toast.success("Login successful!");
           navigate("/home");
         } else {

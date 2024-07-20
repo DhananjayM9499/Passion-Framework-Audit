@@ -112,9 +112,10 @@
   margin-left: 2rem;
 } */
 /* Navbar.css */
-
+/*******************************************************************************************
 /* Navbar */
 
+/*********************/
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -156,11 +157,12 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 250px; /* Adjust width as needed */
+  width: 260px; /* Adjust width as needed */
   height: 100%;
   background-color: transparent;
   transition: all 0.3s ease-in-out;
   transform: translateX(-100%);
+  overflow-y: auto;
 }
 
 .nav-menu.active {
@@ -189,6 +191,7 @@
   color: #333;
   display: block;
   font-size: 1.2rem;
+  text-align: left;
 }
 
 .nav-menu-items li a:hover {
@@ -233,4 +236,21 @@
   .nav-menu-items li a {
     font-size: 1rem;
   }
+}
+
+.sub-nav-text {
+  padding-left: 2rem;
+  font-size: 1.2rem;
+  color: #0d0c0c;
+  text-align: left;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.sub-nav-text a {
+  color: #0d0c0c;
+}
+
+.sub-nav-text a:hover {
+  color: #ff3131;
 }
