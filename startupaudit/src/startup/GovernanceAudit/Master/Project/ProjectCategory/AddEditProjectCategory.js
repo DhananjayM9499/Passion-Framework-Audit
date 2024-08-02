@@ -2,24 +2,23 @@ import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
-import * as API from "../../Endpoints/Endpoints";
-import Navbar from "../../components/Navbar/Navbar";
+import * as API from "../../../../Endpoints/Endpoints";
+import Navbar from "../../../../components/Navbar/Navbar";
 
 const initialState = {
-  environmentname: "",
-  environmentdescription: "",
+  projectcategory: "",
 };
 
-const AddEditEnvironment = () => {
+const ProjectCategory = () => {
   const [state, setState] = useState(initialState);
-  const { environmentname, environmentdescription } = state;
+  const { projectcategory } = state;
   const navigate = useNavigate();
-  const { environmentid } = useParams();
+  const { projectcategoryid } = useParams();
 
   useEffect(() => {
-    if (environmentid) {
+    if (projectcategoryid) {
       axios
-        .get(API.GET_SPECIFIC_ENVIRONMENT(environmentid))
+        .get(API.GET_SPECIFIC_PROJECTCATEGORY(projectcategoryid))
         .then((resp) => setState({ ...resp.data[0] }))
         .catch((error) => {
           console.error(
@@ -28,7 +27,7 @@ const AddEditEnvironment = () => {
           );
         });
     }
-  }, [environmentid]);
+  }, [projectcategoryid]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -38,31 +37,29 @@ const AddEditEnvironment = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!environmentname || !environmentdescription) {
+    if (!projectcategory) {
       toast.error("Please provide all the inputs");
     } else {
-      if (!environmentid) {
+      if (!projectcategoryid) {
         axios
-          .post(API.POST_ENVIRONMENT_API, {
-            environmentname,
-            environmentdescription,
+          .post(API.POST_PROJECTCATEGORY_API, {
+            projectcategory,
           })
           .then(() => {
             setState(initialState);
-            toast.success("Environment Details Added");
-            setTimeout(() => navigate("/environment"), 500);
+            toast.success("Project Category Details Added");
+            setTimeout(() => navigate("/projectcategory"), 500);
           })
           .catch((err) => toast.error(err.response.data));
       } else {
         axios
-          .put(API.UPDATE_SPECIFIC_ENVIRONMENT(environmentid), {
-            environmentname,
-            environmentdescription,
+          .put(API.UPDATE_SPECIFIC_PROJECTCATEGORY(projectcategoryid), {
+            projectcategory,
           })
           .then(() => {
             setState(initialState);
-            toast.success("Company Details Updated");
-            setTimeout(() => navigate("/environment"), 500);
+            toast.success("Project Category Details Updated");
+            setTimeout(() => navigate("/projectcategory"), 500);
           })
           .catch((err) => toast.error(err.response.data));
       }
@@ -72,33 +69,25 @@ const AddEditEnvironment = () => {
   return (
     <div className="form-container">
       <Navbar />
-      <h1>Environment Details</h1>
+      <h1>Project Category Details</h1>
       <div style={{ marginTop: "auto" }}>
         <form onSubmit={handleSubmit}>
-          <label htmlFor="environmentname">Organization</label>
+          <label htmlFor="projecttype">Project Category</label>
           <input
             type="text"
-            id="environmentname"
-            name="environmentname"
-            placeholder="Enter the Environment Name"
-            value={environmentname || ""}
+            id="projectcategory"
+            name="projectcategory"
+            placeholder="Enter the Project Category"
+            value={projectcategory || ""}
             onChange={handleInputChange}
           />
-          <label htmlFor="contactname">Description</label>
-          <input
-            type="text"
-            id="environmentdescription"
-            name="environmentdescription"
-            placeholder="Enter the description"
-            value={environmentdescription || ""}
-            onChange={handleInputChange}
-          />
+
           <input
             className="btn btn-round btn-signup"
             type="submit"
-            value={environmentid ? "Update" : "Save"}
+            value={projectcategoryid ? "Update" : "Save"}
           />
-          <Link to="/environment">
+          <Link to="/projectcategory">
             <input
               className="btn btn-round btn-signup"
               type="button"
@@ -111,4 +100,4 @@ const AddEditEnvironment = () => {
   );
 };
 
-export default AddEditEnvironment;
+export default ProjectCategory;

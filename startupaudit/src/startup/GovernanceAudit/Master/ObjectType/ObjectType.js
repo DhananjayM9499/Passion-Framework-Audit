@@ -2,28 +2,26 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
-import * as API from "../../Endpoints/Endpoints";
-import Navbar from "../../components/Navbar/Navbar";
-import "./Organization.css";
+import * as API from "../../../Endpoints/Endpoints";
+import Navbar from "../../../components/Navbar/Navbar";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
-import Pagination from "../../components/Pagination/Pagination";
-const Organization = () => {
+import Pagination from "../../../components/Pagination/Pagination";
+
+const ObjectType = () => {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3;
-
-  const userId = localStorage.getItem("user_id");
+  const itemsPerPage = 5;
 
   useEffect(() => {
     loadData();
-  }, [userId]);
+  }, []);
 
   const loadData = async () => {
     try {
-      const response = await axios.get(API.GET_ORGANIZATION_API(userId));
+      const response = await axios.get(API.GET_OBJECTTYPE_API);
       const sortedData = response.data.sort(
-        (a, b) => b.organizationid - a.organizationid
+        (a, b) => b.objecttypeid - a.objecttypeid
       );
       setData(sortedData);
     } catch (error) {
@@ -31,23 +29,19 @@ const Organization = () => {
     }
   };
 
-  const deleteOrganization = async (organizationid) => {
+  const deleteObjectType = async (objecttypeid) => {
     if (window.confirm("Are you sure?")) {
       try {
         const response = await axios.delete(
-          API.DELETE_ORGANIZATION_API(organizationid)
+          API.DELETE_OBJECTTYPE_API(objecttypeid)
         );
         if (response.status === 200) {
-          toast.success("Company Deleted Successfully");
+          toast.success("Object Type Deleted Successfully");
           loadData();
         }
       } catch (error) {
-        if (error.response && error.response.status === 400) {
-          toast.error("Cannot delete Company as there are associates present.");
-        } else {
-          console.error(error);
-          toast.error("An error occurred while deleting Company.");
-        }
+        console.error("Error deleting object type:", error);
+        toast.error("An error occurred while deleting Object Type.");
       }
     }
   };
@@ -55,21 +49,18 @@ const Organization = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
-
   const totalPages = Math.ceil(data.length / itemsPerPage);
 
   return (
     <div className="container">
       <Navbar />
       <div className="mt-4">
-        <h1 className="text-center mb-4 mt-4">AI Governance</h1>
+        <h1 className="text-center mb-4 mt-4">Obect Tes</h1>
         <div className="mb-4 d-flex justify-content-end">
-          <Link to="/organization/add">
-            <div className="input-group center">
-              <button className="btn btn-round btn-signup">
-                Add Organization
-              </button>
-            </div>
+          <Link to="/objecttype/add">
+            <button className="btn btn-round btn-signup">
+              Add Object Type
+            </button>
           </Link>
         </div>
         <div
@@ -80,43 +71,28 @@ const Organization = () => {
             <thead className="thead-dark">
               <tr>
                 <th scope="col">No.</th>
-                <th scope="col">Company Name</th>
-                <th scope="col">Contact Name</th>
-                <th scope="col">Contact Email</th>
-                <th scope="col">Contact Phone</th>
+                <th scope="col" className="w-25">
+                  Object Type
+                </th>
+                <th scope="col">Description</th>
                 <th scope="col">Actions</th>
               </tr>
             </thead>
             <tbody>
               {currentItems.map((item, index) => (
-                <tr key={item.organizationid}>
+                <tr key={item.objecttypeid}>
                   <td>{index + indexOfFirstItem + 1}</td>
-                  <td>{item.organization}</td>
-                  <td>{item.contactname}</td>
-                  <td>{item.contactemail}</td>
-                  <td>{item.contactphone}</td>
+                  <td>{item.objecttype}</td>
+                  <td>{item.objecttypedescription}</td>
                   <td>
-                    <Link to={`/organization/${item.organizationid}`}>
+                    <Link to={`/objecttype/${item.objecttypeid}`}>
                       <FaEdit size={24} />
                     </Link>
-
                     <MdDelete
                       size={24}
-                      onClick={() => deleteOrganization(item.organizationid)}
+                      onClick={() => deleteObjectType(item.objecttypeid)}
+                      style={{ cursor: "pointer", marginLeft: "10px" }}
                     />
-                    <Link
-                      to="/projectdetails"
-                      state={{
-                        organizationName: item.organization,
-                        organizationId: item.organizationid,
-                      }}
-                    >
-                      <div>
-                        <button className="btn btn-round btn-signup">
-                          Project
-                        </button>
-                      </div>
-                    </Link>
                   </td>
                 </tr>
               ))}
@@ -135,4 +111,4 @@ const Organization = () => {
   );
 };
 
-export default Organization;
+export default ObjectType;

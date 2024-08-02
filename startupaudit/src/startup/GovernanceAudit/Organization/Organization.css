@@ -69,17 +69,32 @@
 .pagination button {
   cursor: pointer;
   border: none;
-  background-color: #007bff;
+  background-color: #ff3131;
   color: #fff;
   padding: 8px 16px;
   margin-right: 5px;
   border-radius: 4px;
 }
+
+.pagination button:hover,
+.pagination button:hover .page-link {
+  color: red; /* Changes text color to red on hover */
+}
+
+.pagination .page-link {
+  color: #fff; /* Default text color for pagination numbers */
+}
+
+.pagination button.active {
+  background-color: #fff; /* White background for active button */
+}
+
+.pagination button.active .page-link {
+  color: red; /* Red text color for active button */
+}
+
 .table-responsive {
   width: 90%;
-}
-.pagination button.active {
-  background-color: #0056b3;
 }
 
 @media (max-width: 768px) {
@@ -97,4 +112,13 @@
   .pagination button {
     padding: 6px 12px;
   }
+}
+
+/* Active State for Pagination */
+.active > .page-link,
+.page-link.active {
+  z-index: 3;
+  color: red; /* Red text color for active button */
+  background-color: #fff; /* White background for active button */
+  border-color: #ff3131; /* Red border color for active button */
 }

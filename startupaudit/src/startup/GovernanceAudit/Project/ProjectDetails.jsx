@@ -1,29 +1,34 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
-import * as API from "../../Endpoints/Endpoints";
+import * as API from "../../Endpoints/Endpoints"; // Adjust the import path
 import Navbar from "../../components/Navbar/Navbar";
-import "./Organization.css";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import Pagination from "../../components/Pagination/Pagination";
-const Organization = () => {
+
+const ProjectDetails = () => {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
 
   const userId = localStorage.getItem("user_id");
+  const location = useLocation();
 
+  const { organizationName } = location.state || {};
+  console.log(organizationName);
   useEffect(() => {
     loadData();
   }, [userId]);
 
   const loadData = async () => {
     try {
-      const response = await axios.get(API.GET_ORGANIZATION_API(userId));
+      const response = await axios.get(
+        API.GET_PROJECTDETAILS_BYID(userId, organizationName)
+      );
       const sortedData = response.data.sort(
-        (a, b) => b.organizationid - a.organizationid
+        (a, b) => b.projectid - a.projectid
       );
       setData(sortedData);
     } catch (error) {
@@ -31,23 +36,19 @@ const Organization = () => {
     }
   };
 
-  const deleteOrganization = async (organizationid) => {
+  const deleteProject = async (projectid) => {
     if (window.confirm("Are you sure?")) {
       try {
         const response = await axios.delete(
-          API.DELETE_ORGANIZATION_API(organizationid)
+          API.DELETE_PROJECTDETAILS_API(projectid)
         );
         if (response.status === 200) {
-          toast.success("Company Deleted Successfully");
+          toast.success("Project Deleted Successfully");
           loadData();
         }
       } catch (error) {
-        if (error.response && error.response.status === 400) {
-          toast.error("Cannot delete Company as there are associates present.");
-        } else {
-          console.error(error);
-          toast.error("An error occurred while deleting Company.");
-        }
+        console.error(error);
+        toast.error("An error occurred while deleting the project.");
       }
     }
   };
@@ -62,13 +63,11 @@ const Organization = () => {
     <div className="container">
       <Navbar />
       <div className="mt-4">
-        <h1 className="text-center mb-4 mt-4">AI Governance</h1>
+        <h1 className="text-center mb-4 mt-4">Proect Details</h1>
         <div className="mb-4 d-flex justify-content-end">
-          <Link to="/organization/add">
+          <Link to="/projectdetails/add" state={{ organizationName }}>
             <div className="input-group center">
-              <button className="btn btn-round btn-signup">
-                Add Organization
-              </button>
+              <button className="btn btn-round btn-signup">Add Project</button>
             </div>
           </Link>
         </div>
@@ -80,42 +79,31 @@ const Organization = () => {
             <thead className="thead-dark">
               <tr>
                 <th scope="col">No.</th>
-                <th scope="col">Company Name</th>
-                <th scope="col">Contact Name</th>
-                <th scope="col">Contact Email</th>
-                <th scope="col">Contact Phone</th>
+                <th scope="col">Organization</th>
+                <th scope="col">Project Name</th>
+                <th scope="col">Project Code</th>
+                <th scope="col">Audit Date</th>
                 <th scope="col">Actions</th>
               </tr>
             </thead>
             <tbody>
               {currentItems.map((item, index) => (
-                <tr key={item.organizationid}>
+                <tr key={item.projectid}>
                   <td>{index + indexOfFirstItem + 1}</td>
                   <td>{item.organization}</td>
-                  <td>{item.contactname}</td>
-                  <td>{item.contactemail}</td>
-                  <td>{item.contactphone}</td>
+                  <td>{item.projectname}</td>
+                  <td>{item.projectcode}</td>
+                  <td>{new Date(item.auditdate).toLocaleDateString()}</td>
                   <td>
-                    <Link to={`/organization/${item.organizationid}`}>
+                    <Link to={`/projectdetails/${item.projectdetailsid}`}>
                       <FaEdit size={24} />
                     </Link>
-
                     <MdDelete
                       size={24}
-                      onClick={() => deleteOrganization(item.organizationid)}
+                      onClick={() => deleteProject(item.projectdetailsid)}
                     />
-                    <Link
-                      to="/projectdetails"
-                      state={{
-                        organizationName: item.organization,
-                        organizationId: item.organizationid,
-                      }}
-                    >
-                      <div>
-                        <button className="btn btn-round btn-signup">
-                          Project
-                        </button>
-                      </div>
+                    <Link to={`/projectdetails/view/${item.projectid}`}>
+                      <button className="btn btn-round btn-signup">View</button>
                     </Link>
                   </td>
                 </tr>
@@ -135,4 +123,4 @@ const Organization = () => {
   );
 };
 
-export default Organization;
+export default ProjectDetails;

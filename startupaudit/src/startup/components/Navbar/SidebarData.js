@@ -1,17 +1,28 @@
 import React from "react";
-import { GoOrganization, GoDatabase, GoTasklist } from "react-icons/go";
-import { SiThealgorithms } from "react-icons/si";
-import { AiOutlineAudit, AiOutlineHome } from "react-icons/ai";
+import { GoOrganization } from "react-icons/go";
+import {
+  AiOutlineAudit,
+  AiOutlineHome,
+  AiOutlineFundProjectionScreen,
+} from "react-icons/ai";
 import { RiGovernmentLine } from "react-icons/ri";
-import { LiaExternalLinkSquareAltSolid } from "react-icons/lia";
-import { PiAirTrafficControl, PiUsersThree } from "react-icons/pi";
-import { GrResources } from "react-icons/gr";
+import { VscTypeHierarchy } from "react-icons/vsc";
+import {
+  LiaExternalLinkSquareAltSolid,
+  LiaObjectUngroup,
+} from "react-icons/lia";
+import {
+  PiAirTrafficControl,
+  PiUsersThree,
+  PiBlueprintLight,
+} from "react-icons/pi";
 import { IoWarningOutline, IoHardwareChipOutline } from "react-icons/io5";
 import { GrGroup } from "react-icons/gr";
 import { BiLeaf } from "react-icons/bi";
 import { LuClipboardCheck } from "react-icons/lu";
-import { TbListDetails } from "react-icons/tb";
-import { MdOutlineChecklist } from "react-icons/md";
+import { TbListDetails, TbActivityHeartbeat } from "react-icons/tb";
+import { MdOutlineCategory, MdSyncProblem } from "react-icons/md";
+import { HiOutlineUserGroup } from "react-icons/hi";
 export const SidebarData = [
   {
     title: "Home",
@@ -25,12 +36,7 @@ export const SidebarData = [
     icon: <GoOrganization />,
     cName: "nav-text",
   },
-  {
-    title: "Algorithm Inventory",
-    path: "/algorithminventory",
-    icon: <SiThealgorithms />,
-    cName: "nav-text",
-  },
+
   {
     title: "Governance",
     path: "#",
@@ -39,7 +45,7 @@ export const SidebarData = [
     subNav: [
       {
         title: "Governance Framework",
-        path: "/framework",
+        path: "/governancegroup",
         icon: <RiGovernmentLine />,
         cName: "sub-nav-text",
       },
@@ -51,7 +57,7 @@ export const SidebarData = [
       },
       {
         title: "Control",
-        path: "/control",
+        path: "/governancecontrol",
         icon: <PiAirTrafficControl />,
         cName: "sub-nav-text",
       },
@@ -87,30 +93,7 @@ export const SidebarData = [
         icon: <IoHardwareChipOutline />,
         cName: "sub-nav-text",
       },
-      {
-        title: "Resources",
-        path: "/resources",
-        icon: <GrResources />,
-        cName: "sub-nav-text",
-      },
-      {
-        title: "Issue",
-        path: "/issue",
-        icon: <MdOutlineChecklist />,
-        cName: "sub-nav-text",
-      },
-      {
-        title: "Dataset",
-        path: "/dataset",
-        icon: <GoDatabase />,
-        cName: "sub-nav-text",
-      },
-      {
-        title: "Theme Activity",
-        path: "/themeactivity",
-        icon: <GoTasklist />,
-        cName: "sub-nav-text",
-      },
+
       {
         title: "Responsibility Center",
         path: "/responsibilitycenter",
@@ -121,6 +104,54 @@ export const SidebarData = [
         title: "Responsibility Group",
         path: "/responsibilitygroup",
         icon: <PiUsersThree />,
+        cName: "sub-nav-text",
+      },
+      {
+        title: "Project Type",
+        path: "/projecttype",
+        icon: <AiOutlineFundProjectionScreen />,
+        cName: "sub-nav-text",
+      },
+      {
+        title: "Project Category",
+        path: "/projectcategory",
+        icon: <MdOutlineCategory />,
+        cName: "sub-nav-text",
+      },
+      {
+        title: "Issue",
+        path: "/issue",
+        icon: <MdSyncProblem />,
+        cName: "sub-nav-text",
+      },
+      {
+        title: "Theme",
+        path: "/thememaster",
+        icon: <PiBlueprintLight />,
+        cName: "sub-nav-text",
+      },
+      {
+        title: "Theme Activity",
+        path: "/themeactivity",
+        icon: <TbActivityHeartbeat />,
+        cName: "sub-nav-text",
+      },
+      {
+        title: "Activity Group",
+        path: "/activitygroup",
+        icon: <HiOutlineUserGroup />,
+        cName: "sub-nav-text",
+      },
+      {
+        title: "Object",
+        path: "/object",
+        icon: <LiaObjectUngroup />,
+        cName: "sub-nav-text",
+      },
+      {
+        title: "Object Type",
+        path: "/objecttype",
+        icon: <VscTypeHierarchy />,
         cName: "sub-nav-text",
       },
     ],

@@ -28,7 +28,7 @@ function Login() {
         if (response.ok) {
           // Save token in local storage or context
 
-          localStorage.setItem("token", data.token);
+          localStorage.setItem("token", data.token || "");
 
           toast.success("Login successful!");
           navigate("/home");

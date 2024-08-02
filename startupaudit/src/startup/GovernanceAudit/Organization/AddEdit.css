@@ -34,7 +34,20 @@
   color: black;
 }
 
-.form-container input[type="text"] {
+.form-container input[type="number"],
+.form-container input[type="text"],
+.form-container input[type="email"],
+.form-container input[type="date"],
+.form-container input[type="time"] {
+  width: calc(100% - 20px); /* Adjusts input width to account for padding */
+  padding: 10px;
+  margin: 5px 0 20px;
+  border: 1px solid #ccc;
+  border-radius: 50px;
+  box-sizing: border-box;
+}
+
+.form-container select[type="text"] {
   width: calc(100% - 20px); /* Adjusts input width to account for padding */
   padding: 10px;
   margin: 5px 0 20px;

@@ -2,51 +2,50 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
-import * as API from "../../Endpoints/Endpoints";
-import Navbar from "../../components/Navbar/Navbar";
-import "./Organization.css";
+import * as API from "../../../../Endpoints/Endpoints";
+import Navbar from "../../../../components/Navbar/Navbar";
+
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
-import Pagination from "../../components/Pagination/Pagination";
-const Organization = () => {
+import Pagination from "../../../../components/Pagination/Pagination";
+
+const ThrustArea = () => {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3;
-
-  const userId = localStorage.getItem("user_id");
+  const itemsPerPage = 5;
 
   useEffect(() => {
     loadData();
-  }, [userId]);
+  }, []);
 
   const loadData = async () => {
     try {
-      const response = await axios.get(API.GET_ORGANIZATION_API(userId));
-      const sortedData = response.data.sort(
-        (a, b) => b.organizationid - a.organizationid
-      );
+      const response = await axios.get(API.GET_THRUSTAREA_API);
+      const sortedData = response.data.sort((a, b) => b.thrustid - a.thrustid);
       setData(sortedData);
     } catch (error) {
       console.error("Error loading data:", error);
     }
   };
 
-  const deleteOrganization = async (organizationid) => {
+  const deleteThrustArea = async (thrustid) => {
     if (window.confirm("Are you sure?")) {
       try {
         const response = await axios.delete(
-          API.DELETE_ORGANIZATION_API(organizationid)
+          API.DELETE_THRUSTAREA_API(thrustid)
         );
         if (response.status === 200) {
-          toast.success("Company Deleted Successfully");
+          toast.success("Thrust area Deleted Successfully");
           loadData();
         }
       } catch (error) {
         if (error.response && error.response.status === 400) {
-          toast.error("Cannot delete Company as there are associates present.");
+          toast.error(
+            "Cannot delete Thrust area as there are associates present."
+          );
         } else {
           console.error(error);
-          toast.error("An error occurred while deleting Company.");
+          toast.error("An error occurred while deleting Thrust area.");
         }
       }
     }
@@ -62,12 +61,12 @@ const Organization = () => {
     <div className="container">
       <Navbar />
       <div className="mt-4">
-        <h1 className="text-center mb-4 mt-4">AI Governance</h1>
+        <h1 className="text-center mb-4 mt-4">Thrust Area</h1>
         <div className="mb-4 d-flex justify-content-end">
-          <Link to="/organization/add">
+          <Link to="/thrustarea/add">
             <div className="input-group center">
               <button className="btn btn-round btn-signup">
-                Add Organization
+                Add Add Thrust
               </button>
             </div>
           </Link>
@@ -80,43 +79,28 @@ const Organization = () => {
             <thead className="thead-dark">
               <tr>
                 <th scope="col">No.</th>
-                <th scope="col">Company Name</th>
-                <th scope="col">Contact Name</th>
-                <th scope="col">Contact Email</th>
-                <th scope="col">Contact Phone</th>
+                <th scope="col" className="w-25">
+                  Thrust Area
+                </th>
+
                 <th scope="col">Actions</th>
               </tr>
             </thead>
             <tbody>
               {currentItems.map((item, index) => (
-                <tr key={item.organizationid}>
+                <tr key={item.thrustid}>
                   <td>{index + indexOfFirstItem + 1}</td>
-                  <td>{item.organization}</td>
-                  <td>{item.contactname}</td>
-                  <td>{item.contactemail}</td>
-                  <td>{item.contactphone}</td>
+                  <td>{item.thrustarea}</td>
+
                   <td>
-                    <Link to={`/organization/${item.organizationid}`}>
+                    <Link to={`/thrustarea/${item.thrustid}`}>
                       <FaEdit size={24} />
                     </Link>
 
                     <MdDelete
                       size={24}
-                      onClick={() => deleteOrganization(item.organizationid)}
+                      onClick={() => deleteThrustArea(item.thrustid)}
                     />
-                    <Link
-                      to="/projectdetails"
-                      state={{
-                        organizationName: item.organization,
-                        organizationId: item.organizationid,
-                      }}
-                    >
-                      <div>
-                        <button className="btn btn-round btn-signup">
-                          Project
-                        </button>
-                      </div>
-                    </Link>
                   </td>
                 </tr>
               ))}
@@ -135,4 +119,4 @@ const Organization = () => {
   );
 };
 
-export default Organization;
+export default ThrustArea;
