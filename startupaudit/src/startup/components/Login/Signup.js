@@ -107,7 +107,7 @@ function Signup() {
               <div className="col-lg-6 col-md-6 box-de">
                 <div className="inn-cover">
                   <div className="ditk-inf">
-                    <h2 className="w-100">Create Your Account</h2>
+                    <h2 className="w-100 text-light">Create Your Account</h2>
                     <p>
                       Join us and create your account to access exclusive
                       features tailored just for you. Experience seamless

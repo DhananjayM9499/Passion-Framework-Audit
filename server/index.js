@@ -209,6 +209,21 @@ app.put("/startup-api/organization/:organizationid", (req, res) => {
     }
   );
 });
+//GET ORGANIZATION BY NAME
+app.get("/startup-api/organizationName/:organization", async (req, res) => {
+  try {
+    const { organization } = req.params;
+    const sqlGet = "SELECT * FROM public.organization WHERE organization = $1";
+
+    const result = await pool.query(sqlGet, [organization]);
+
+    res.send(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while fetching the Organization.");
+  }
+});
+
 /****************************************************************Environment API********************************************************************** */
 //GET Environment API
 app.get("/startup-api/environment", (req, res) => {
@@ -1440,26 +1455,7 @@ app.post("/startup-api/projectdetails", async (req, res) => {
   } = req.body;
 
   // Validation
-  if (
-    !organization ||
-    !projectname ||
-    !projectcode ||
-    !auditdate ||
-    !audittime ||
-    !objecttype ||
-    !object ||
-    !stakeholder ||
-    !technology ||
-    !environment ||
-    !theme ||
-    !themeactivity ||
-    !issue ||
-    !user_id ||
-    !project_type ||
-    !project_category ||
-    !responsibilitycenter ||
-    !responsibilitygroup
-  ) {
+  if (!organization) {
     return res.status(400).json({ error: "All fields are required" });
   }
 
@@ -1521,26 +1517,7 @@ app.put("/startup-api/projectdetails/:projectdetailsid", async (req, res) => {
   } = req.body;
 
   // Validation
-  if (
-    !organization ||
-    !projectname ||
-    !projectcode ||
-    !auditdate ||
-    !audittime ||
-    !objecttype ||
-    !object ||
-    !stakeholder ||
-    !technology ||
-    !environment ||
-    !theme ||
-    !themeactivity ||
-    !issue ||
-    !user_id ||
-    !project_type ||
-    !project_category ||
-    !responsibilitycenter ||
-    !responsibilitygroup
-  ) {
+  if (!organization) {
     return res.status(400).json({ error: "All fields are required" });
   }
 
@@ -1793,6 +1770,437 @@ app.delete("/startup-api/objecttype/:objecttypeid", (req, res) => {
     }
   });
 });
+/*************************************************EVIDENCE APIS********************************************************* */
+//GET ALL EVIDENCE
+app.get("/startup-api/evidence", (req, res) => {
+  const sqlGet = "SELECT * FROM public.evidence";
+  pool.query(sqlGet, (error, result) => {
+    if (error) {
+      console.error("Error fetching evidence records", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res.json(result.rows);
+    }
+  });
+});
+
+//GET EVIDENCE BY USERID AND PROJECTID
+app.get("/startup-api/evidence/:user_id/:projectdetailsid", (req, res) => {
+  const { user_id, projectdetailsid } = req.params;
+  const sqlGet =
+    "SELECT * FROM public.evidence WHERE user_id = $1 AND projectdetailsid=$2";
+
+  pool.query(sqlGet, [user_id, projectdetailsid], (error, result) => {
+    if (error) {
+      console.error("Error fetching evidence record", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res.json(result.rows);
+    }
+  });
+});
+//GET EVIDENCE BY ID
+app.get("/startup-api/evidence/:evidenceid", (req, res) => {
+  const { evidenceid } = req.params;
+  const sqlGet = "SELECT * FROM public.evidence WHERE evidenceid = $1";
+
+  pool.query(sqlGet, [evidenceid], (error, result) => {
+    if (error) {
+      console.error("Error fetching evidence record", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res.json(result.rows);
+    }
+  });
+});
+//CREATE EVIDENCE
+app.post("/startup-api/evidence", (req, res) => {
+  const {
+    projectdetailsid,
+    user_id,
+    governancegroup,
+    thrustarea,
+    controlname,
+    controlwt,
+    subcontrolname,
+    subcontrolwt,
+    expectedevidence,
+    evidencereferencelink,
+    evidenceremark,
+    evidencestatus,
+  } = req.body;
+
+  const sqlInsert =
+    "INSERT INTO public.evidence( projectdetailsid, user_id, governancegroup, thrustarea, controlname, controlwt, subcontrolname, subcontrolwt, expectedevidence, evidencereferencelink, evidenceremark, evidencestatus) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)";
+  const values = [
+    projectdetailsid,
+    user_id,
+    governancegroup,
+    thrustarea,
+    controlname,
+    controlwt,
+    subcontrolname,
+    subcontrolwt,
+    expectedevidence,
+    evidencereferencelink,
+    evidenceremark,
+    evidencestatus,
+  ];
+
+  pool.query(sqlInsert, values, (error, result) => {
+    if (error) {
+      console.error("Error inserting evidence record", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res
+        .status(200)
+        .json({ message: "Evidence record inserted successfully" });
+    }
+  });
+});
+
+//UPDATE EVIDENCE
+app.put("/startup-api/evidence/:evidenceid", (req, res) => {
+  const { evidenceid } = req.params;
+  const {
+    projectdetailsid,
+    user_id,
+    governancegroup,
+    thrustarea,
+    controlname,
+    controlwt,
+    subcontrolname,
+    subcontrolwt,
+    expectedevidence,
+    evidencereferencelink,
+    evidenceremark,
+    evidencestatus,
+  } = req.body;
+
+  const sqlUpdate =
+    "UPDATE public.evidence SET projectdetailsid = $1, user_id = $2, governancegroup = $3, thrustarea = $4, controlname = $5, controlwt = $6, subcontrolname = $7, subcontrolwt = $8, expectedevidence = $9, evidencereferencelink = $10, evidenceremark = $11, evidencestatus = $12 WHERE evidenceid = $13";
+  const values = [
+    projectdetailsid,
+    user_id,
+    governancegroup,
+    thrustarea,
+    controlname,
+    controlwt,
+    subcontrolname,
+    subcontrolwt,
+    expectedevidence,
+    evidencereferencelink,
+    evidenceremark,
+    evidencestatus,
+    evidenceid,
+  ];
+
+  pool.query(sqlUpdate, values, (error, result) => {
+    if (error) {
+      console.error("Error updating evidence record", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res.status(200).json({ message: "Evidence record updated successfully" });
+    }
+  });
+});
+
+//DELETE EVIDENCE
+app.delete("/startup-api/evidence/:evidenceid", (req, res) => {
+  const { evidenceid } = req.params;
+  const sqlDelete = "DELETE FROM public.evidence WHERE evidenceid = $1";
+
+  pool.query(sqlDelete, [evidenceid], (error, result) => {
+    if (error) {
+      console.error("Error deleting evidence record", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res.status(200).json({ message: "Evidence record deleted successfully" });
+    }
+  });
+});
+
+/*************************************************ASSESSMENT APIS************************************************************************ */
+// GET ALL ASSESSMENTS
+app.get("/startup-api/assessment", (req, res) => {
+  const sqlGet = "SELECT * FROM public.assessment";
+  pool.query(sqlGet, (error, result) => {
+    if (error) {
+      console.error("Error fetching assessment records", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res.json(result.rows);
+    }
+  });
+});
+
+// GET ASSESSMENT BY ID
+app.get("/startup-api/assessment/:assessmentid", (req, res) => {
+  const { assessmentid } = req.params;
+  const sqlGet = "SELECT * FROM public.assessment WHERE assessmentid = $1";
+
+  pool.query(sqlGet, [assessmentid], (error, result) => {
+    if (error) {
+      console.error("Error fetching assessment record", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res.json(result.rows);
+    }
+  });
+});
+
+// GET ASSESSMENT BY ID AND EVIDENCEID
+app.get("/startup-api/assessment/:user_id/:evidenceid", (req, res) => {
+  const { user_id, evidenceid } = req.params;
+  const sqlGet =
+    "SELECT * FROM public.assessment WHERE user_id = $1 AND evidenceid=$2";
+
+  pool.query(sqlGet, [user_id, evidenceid], (error, result) => {
+    if (error) {
+      console.error("Error fetching assessment record", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res.json(result.rows);
+    }
+  });
+});
+
+// CREATE ASSESSMENT
+app.post("/startup-api/assessment", (req, res) => {
+  const {
+    evidenceid,
+    user_id,
+    assessmentreferencelink,
+    assessmentupload,
+    assessmentremark,
+    assessmentstatus,
+    assessmentscore,
+  } = req.body;
+
+  const sqlInsert =
+    "INSERT INTO public.assessment( evidenceid, user_id, assessmentreferencelink, assessmentupload, assessmentremark, assessmentstatus, assessmentscore) VALUES ($1, $2, $3, $4, $5, $6, $7)";
+  const values = [
+    evidenceid,
+    user_id,
+    assessmentreferencelink,
+    assessmentupload,
+    assessmentremark,
+    assessmentstatus,
+    assessmentscore,
+  ];
+
+  pool.query(sqlInsert, values, (error, result) => {
+    if (error) {
+      console.error("Error inserting assessment record", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res
+        .status(200)
+        .json({ message: "Assessment record inserted successfully" });
+    }
+  });
+});
+
+// UPDATE ASSESSMENT
+app.put("/startup-api/assessment/:assessmentid", (req, res) => {
+  const { assessmentid } = req.params;
+  const {
+    evidenceid,
+    user_id,
+    assessmentreferencelink,
+    assessmentupload,
+    assessmentremark,
+    assessmentstatus,
+    assessmentscore,
+  } = req.body;
+
+  const sqlUpdate =
+    "UPDATE public.assessment SET evidenceid = $1, user_id = $2, assessmentreferencelink = $3, assessmentupload = $4, assessmentremark = $5, assessmentstatus = $6, assessmentscore = $7 WHERE assessmentid = $8";
+  const values = [
+    evidenceid,
+    user_id,
+    assessmentreferencelink,
+    assessmentupload,
+    assessmentremark,
+    assessmentstatus,
+    assessmentscore,
+    assessmentid,
+  ];
+
+  pool.query(sqlUpdate, values, (error, result) => {
+    if (error) {
+      console.error("Error updating assessment record", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res
+        .status(200)
+        .json({ message: "Assessment record updated successfully" });
+    }
+  });
+});
+
+// DELETE ASSESSMENT
+app.delete("/startup-api/assessment/:assessmentid", (req, res) => {
+  const { assessmentid } = req.params;
+  const sqlDelete = "DELETE FROM public.assessment WHERE assessmentid = $1";
+
+  pool.query(sqlDelete, [assessmentid], (error, result) => {
+    if (error) {
+      console.error("Error deleting assessment record", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res
+        .status(200)
+        .json({ message: "Assessment record deleted successfully" });
+    }
+  });
+});
+/**************************************AUDIT APIS***************************************************** */
+//GET ALL AUDIT
+app.get("/startup-api/governanceaudit", async (req, res) => {
+  const sqlGet = "SELECT * FROM public.governanceaudit";
+  try {
+    const result = await pool.query(sqlGet);
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching governance audit records", error.stack);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+//GET AUDIT BY ID
+
+app.get("/startup-api/governanceaudit/:governanceauditid", async (req, res) => {
+  const { governanceauditid } = req.params;
+  const sqlGet =
+    "SELECT * FROM public.governanceaudit WHERE governanceauditid = $1";
+
+  pool.query(sqlGet, [governanceauditid], (error, result) => {
+    if (error) {
+      console.error("Error fetching audit record", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res.json(result.rows);
+    }
+  });
+});
+
+//GET AUDIT BY ID AND ASSESSMENTID
+app.get(
+  "/startup-api/governanceaudit/:user_id/:assessmentid",
+  async (req, res) => {
+    const { user_id, assessmentid } = req.params;
+    const sqlGet =
+      "SELECT * FROM public.governanceaudit WHERE user_id = $1 AND assessmentid = $2";
+
+    pool.query(sqlGet, [user_id, assessmentid], (error, result) => {
+      if (error) {
+        console.error("Error fetching assessment record", error);
+        res.status(500).json({ error: "Internal server error" });
+      } else {
+        res.json(result.rows);
+      }
+    });
+  }
+);
+
+//ADD AUDIT
+app.post("/startup-api/governanceaudit", async (req, res) => {
+  const {
+    user_id,
+    assessmentid,
+    auditreferencelink,
+    auditupload,
+    auditremark,
+    auditstatus,
+    auditscore,
+  } = req.body;
+
+  const sqlInsert =
+    "INSERT INTO public.governanceaudit( user_id, assessmentid, auditreferencelink, auditupload, auditremark, auditstatus, auditscore) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *";
+  const values = [
+    user_id,
+    assessmentid,
+    auditreferencelink,
+    auditupload,
+    auditremark,
+    auditstatus,
+    auditscore,
+  ];
+
+  pool.query(sqlInsert, values, (error, result) => {
+    if (error) {
+      console.error("Error inserting audit record", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res.status(200).json({ message: "Audit record inserted successfully" });
+    }
+  });
+});
+
+//UPDATE AUDIT
+app.put("/startup-api/governanceaudit/:governanceauditid", async (req, res) => {
+  const { governanceauditid } = req.params;
+  const {
+    user_id,
+    assessmentid,
+    auditreferencelink,
+    auditupload,
+    auditremark,
+    auditstatus,
+    auditscore,
+  } = req.body;
+
+  const sqlUpdate =
+    "UPDATE public.governanceaudit SET user_id = $1, assessmentid = $2, auditreferencelink = $3, auditupload = $4, auditremark = $5, auditstatus = $6, auditscore = $7 WHERE governanceauditid = $8 RETURNING *";
+  const values = [
+    user_id,
+    assessmentid,
+    auditreferencelink,
+    auditupload,
+    auditremark,
+    auditstatus,
+    auditscore,
+    governanceauditid,
+  ];
+
+  try {
+    const result = await pool.query(sqlUpdate, values);
+    if (result.rowCount === 0) {
+      res.status(404).json({ error: "Governance audit not found" });
+    } else {
+      res.json({
+        message: "Governance audit record updated successfully",
+        data: result.rows[0],
+      });
+    }
+  } catch (error) {
+    console.error("Error updating governance audit record", error.stack);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+//DELETE AUDIT
+app.delete(
+  "/startup-api/governanceaudit/:governanceauditid",
+  async (req, res) => {
+    const { governanceauditid } = req.params;
+    const sqlDelete =
+      "DELETE FROM public.governanceaudit WHERE governanceauditid = $1";
+
+    try {
+      const result = await pool.query(sqlDelete, [governanceauditid]);
+      if (result.rowCount === 0) {
+        res.status(404).json({ error: "Governance audit not found" });
+      } else {
+        res.json({ message: "Governance audit record deleted successfully" });
+      }
+    } catch (error) {
+      console.error("Error deleting governance audit record", error.stack);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+);
 
 /************************************************************************************************************************* */
 // Start server

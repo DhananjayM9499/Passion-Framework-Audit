@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
-import * as API from "../../Endpoints/Endpoints"; // Adjust the import path
+import * as API from "../../Endpoints/Endpoints"; // Adjust the import path as needed
 import Navbar from "../../components/Navbar/Navbar";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
@@ -15,12 +15,11 @@ const ProjectDetails = () => {
 
   const userId = localStorage.getItem("user_id");
   const location = useLocation();
-
   const { organizationName } = location.state || {};
-  console.log(organizationName);
+
   useEffect(() => {
     loadData();
-  }, [userId]);
+  }, [userId, organizationName]); // Added organizationName to dependency array
 
   const loadData = async () => {
     try {
@@ -56,7 +55,6 @@ const ProjectDetails = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
-
   const totalPages = Math.ceil(data.length / itemsPerPage);
 
   return (
@@ -72,8 +70,8 @@ const ProjectDetails = () => {
           </Link>
         </div>
         <div
-          className="table-responsive mb-4 d-flex justify-content-end"
-          style={{ maxWidth: "85%", margin: "0 auto", marginRight: 0 }}
+          className="table-responsive mb-4"
+          style={{ maxWidth: "85%", margin: "0 auto", marginRight: "0" }}
         >
           <table className="table table-bordered table-hover">
             <thead className="thead-dark">
@@ -101,9 +99,17 @@ const ProjectDetails = () => {
                     <MdDelete
                       size={24}
                       onClick={() => deleteProject(item.projectdetailsid)}
+                      style={{ cursor: "pointer", marginLeft: "10px" }}
                     />
-                    <Link to={`/projectdetails/view/${item.projectid}`}>
-                      <button className="btn btn-round btn-signup">View</button>
+                    <Link
+                      to="/evidence"
+                      state={{ projectId: item.projectdetailsid }}
+                    >
+                      <div>
+                        <button className="btn btn-round btn-signup ml-2">
+                          Evidence
+                        </button>
+                      </div>
                     </Link>
                   </td>
                 </tr>
@@ -111,13 +117,15 @@ const ProjectDetails = () => {
             </tbody>
           </table>
         </div>
-        <div className="d-flex justify-content-center">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            paginate={setCurrentPage}
-          />
-        </div>
+        {data.length > itemsPerPage && (
+          <div className="d-flex justify-content-center">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              paginate={setCurrentPage}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

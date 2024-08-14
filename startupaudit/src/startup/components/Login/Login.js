@@ -100,7 +100,7 @@ function Login() {
                 <div className="inn-cover">
                   <div className="ditk-inf">
                     <div className="small-logo"></div>
-                    <h2 className="w-100">Didn't Have an Account</h2>
+                    <h2 className="w-100 text-light">Didn't Have an Account</h2>
                     <p>
                       Explore our platform and create your profile today to
                       access exclusive features and personalized services

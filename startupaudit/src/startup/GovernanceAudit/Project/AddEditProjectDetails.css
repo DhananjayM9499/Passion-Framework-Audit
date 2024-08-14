@@ -36,7 +36,14 @@
   border-radius: 50px;
   box-sizing: border-box;
 }
-
+.add-edit-project-select {
+  width: calc(100% - 20px); /* Adjusts input width to account for padding */
+  padding: 10px;
+  margin: 5px 0 20px;
+  border: 1px solid #ccc;
+  border-radius: 50px;
+  box-sizing: border-box;
+}
 .add-edit-project-btn {
   padding: 0.75rem 1.5rem;
   border: none;

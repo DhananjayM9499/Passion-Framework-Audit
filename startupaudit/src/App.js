@@ -50,6 +50,13 @@ import Object from "./startup/GovernanceAudit/Master/Object/Object";
 import AddEditObjectType from "./startup/GovernanceAudit/Master/ObjectType/AddEditObjectType";
 import ObjectType from "./startup/GovernanceAudit/Master/ObjectType/ObjectType";
 import AddEditObject from "./startup/GovernanceAudit/Master/Object/AddEditObject";
+import Evidence from "./startup/GovernanceAudit/Evidence/Evidence";
+import AddEditEvidence from "./startup/GovernanceAudit/Evidence/AddEditEvidence";
+import Assessment from "./startup/GovernanceAudit/Assessment/Assessment";
+import AddEditAssessment from "./startup/GovernanceAudit/Assessment/AddEditAssessment";
+import Audit from "./startup/GovernanceAudit/Audit/Audit";
+import AddEditAudit from "./startup/GovernanceAudit/Audit/AddEditAudit";
+
 function App() {
   return (
     <div className="App">
@@ -535,6 +542,81 @@ function App() {
               element={
                 <PrivateRoute>
                   <AddEditObject />
+                </PrivateRoute>
+              }
+            />
+            {/***********************************************Evidence URLS********************************************************** */}
+            <Route
+              path="/evidence"
+              element={
+                <PrivateRoute>
+                  <Evidence />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/evidence/add"
+              element={
+                <PrivateRoute>
+                  <AddEditEvidence />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/evidence/:evidenceid"
+              element={
+                <PrivateRoute>
+                  <AddEditEvidence />
+                </PrivateRoute>
+              }
+            />
+            {/******************************************ASSESSMENT URLS***************************************************** */}
+            <Route
+              path="/assessment"
+              element={
+                <PrivateRoute>
+                  <Assessment />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/assessment/add"
+              element={
+                <PrivateRoute>
+                  <AddEditAssessment />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/assessment/:assessmentid"
+              element={
+                <PrivateRoute>
+                  <AddEditAssessment />
+                </PrivateRoute>
+              }
+            />
+            {/******************************************AUDIT URLS***************************************************** */}
+            <Route
+              path="/audit"
+              element={
+                <PrivateRoute>
+                  <Audit />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/audit/add"
+              element={
+                <PrivateRoute>
+                  <AddEditAudit />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/audit/:governanceauditid"
+              element={
+                <PrivateRoute>
+                  <AddEditAudit />
                 </PrivateRoute>
               }
             />

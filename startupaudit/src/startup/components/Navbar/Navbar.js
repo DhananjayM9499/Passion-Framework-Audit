@@ -107,6 +107,15 @@ function Navbar() {
     "/object": "Object",
     "/object/add": "Object",
     "/object/:objectid": "Object",
+    "/evidence": "Evidence",
+    "/evidence/add": "Evidence",
+    "/evidence/:evidenceid": "Evidence",
+    "/assessment": "Assessment",
+    "/assessment/add": "Assessment",
+    "/assessment/:assessmentid": "Assessment",
+    "/audit": "Audit",
+    "/audit/add": "Audit",
+    "/audit/:governanceauditid": "Audit",
   };
 
   const activeRoute = routeNames[location.pathname] || "Home";

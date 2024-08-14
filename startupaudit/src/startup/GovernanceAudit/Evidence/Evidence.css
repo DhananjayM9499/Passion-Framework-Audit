@@ -1,0 +1,67 @@
+.evContainer {
+  border: 3px solid #ccc;
+  max-width: 85%;
+  margin: 0 auto;
+  padding: 5px;
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping to prevent overlap */
+  justify-content: flex-start;
+  align-items: left;
+  gap: 20px;
+  margin-right: 0;
+  margin-top: 75px;
+  color: black;
+}
+
+.company-details,
+.project-details {
+  flex: 1 1 42%; /* Flex basis set to 45% with room for gap */
+  min-width: 300px; /* Prevent divs from shrinking too much */
+  box-sizing: border-box;
+  text-align: left;
+  color: black;
+}
+.col {
+  box-sizing: border-box;
+  text-align: left; /* Align all text to the left */
+  color: black;
+}
+.vertical-divider {
+  width: 5px;
+  background: #212121;
+  height: auto;
+  align-self: stretch;
+  padding: 0;
+}
+
+@media (max-width: 1024px) {
+  .evContainer {
+    flex-direction: column;
+  }
+
+  .vertical-divider {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .evidence-page {
+    padding: 10px;
+  }
+
+  .col {
+    text-align: left; /* Ensure all content is left-aligned on smaller screens */
+    flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .evContainer {
+    padding: 5px;
+  }
+
+  .col {
+    font-size: 0.9rem;
+    text-align: left; /* Maintain left alignment */
+  }
+}

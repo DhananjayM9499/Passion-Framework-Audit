@@ -17,6 +17,9 @@ export const POST_ORGANIZATION_API = `${BASE_URL}organization`;
 
 export const UPDATE_SPECIFIC_ORGANIZATION = (organizationid) =>
   `${BASE_URL}organization/${organizationid}`;
+
+export const GET_ORGANIZATION_BYNAME = (organization) =>
+  `${BASE_URL}organizationName/${organization}`;
 /********************ENVIRONMENT************************** */
 export const POST_ENVIRONMENT_API = `${BASE_URL}environment`;
 export const GET_ENVIRONMENT_API = `${BASE_URL}environment`;
@@ -181,3 +184,36 @@ export const GET_SPECIFIC_OBJECT = (objectid) =>
   `${BASE_URL}object/${objectid}`;
 export const UPDATE_SPECIFIC_OBJECT = (objectid) =>
   `${BASE_URL}object/${objectid}`;
+/************************************EVIDENCE************************************************ */
+export const POST_EVIDENCE_API = `${BASE_URL}evidence`;
+export const GET_EVIDENCE_API = `${BASE_URL}evidence`;
+export const DELETE_EVIDENCE_API = (evidenceid) =>
+  `${BASE_URL}evidence/${evidenceid}`;
+export const GET_SPECIFIC_EVIDENCE = (evidenceid) =>
+  `${BASE_URL}evidence/${evidenceid}`;
+export const UPDATE_SPECIFIC_EVIDENCE = (evidenceid) =>
+  `${BASE_URL}evidence/${evidenceid}`;
+export const GET_EVIDENCE_BYUSERID = (user_id, projectdetailsid) =>
+  `${BASE_URL}evidence/${user_id}/${projectdetailsid}`;
+/************************************ASSESSMENT************************************************ */
+export const POST_ASSESSMENT_API = `${BASE_URL}assessment`;
+export const GET_ASSESSMENT_API = `${BASE_URL}assessment`;
+export const DELETE_ASSESSMENT_API = (assessmentid) =>
+  `${BASE_URL}assessment/${assessmentid}`;
+export const GET_SPECIFIC_ASSESSMENT = (assessmentid) =>
+  `${BASE_URL}assessment/${assessmentid}`;
+export const UPDATE_SPECIFIC_ASSESSMENT = (assessmentid) =>
+  `${BASE_URL}assessment/${assessmentid}`;
+export const GET_ASSESSMENT_BYUSERID = (user_id, evidenceid) =>
+  `${BASE_URL}assessment/${user_id}/${evidenceid}`;
+/************************************AUDIT************************************************ */
+export const POST_AUDIT_API = `${BASE_URL}governanceaudit`;
+export const GET_AUDIT_API = `${BASE_URL}governanceaudit`;
+export const DELETE_AUDIT_API = (governanceauditid) =>
+  `${BASE_URL}governanceaudit/${governanceauditid}`;
+export const GET_SPECIFIC_AUDIT = (governanceauditid) =>
+  `${BASE_URL}governanceaudit/${governanceauditid}`;
+export const UPDATE_SPECIFIC_AUDIT = (governanceauditid) =>
+  `${BASE_URL}governanceaudit/${governanceauditid}`;
+export const GET_AUDIT_BYUSERID = (user_id, assessmentid) =>
+  `${BASE_URL}governanceaudit/${user_id}/${assessmentid}`;

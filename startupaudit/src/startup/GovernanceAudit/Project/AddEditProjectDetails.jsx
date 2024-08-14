@@ -107,6 +107,71 @@ const AddEditProjectDetails = () => {
     }
   }, [projectdetailsid, organizationName]);
 
+  const [Obj, setObject] = useState([]);
+  const [objType, setObjectType] = useState([]);
+  const [stake, setStake] = useState([]);
+  const [tech, setTech] = useState([]);
+  const [env, setEnv] = useState([]);
+  const [them, setThem] = useState([]);
+  const [themActivity, setThemActivity] = useState([]);
+  const [isue, setIsue] = useState([]);
+  const [proj, setProj] = useState([]);
+  const [projectType, setProjectType] = useState([]);
+  const [respGroup, setRespGroup] = useState([]);
+  const [respCenter, setRespCenter] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [
+          respGroupData,
+          respCenterData,
+          objectName,
+          objectType,
+          stakeData,
+          techData,
+          envData,
+          themData,
+          themActivityData,
+          // isueData,
+          projData,
+          projectTypeData,
+        ] = await Promise.all([
+          axios.get(API.GET_RESPONSIBILITYGROUP_API),
+          axios.get(API.GET_RESPONSIBILITYCENTER_API),
+          axios.get(API.GET_OBJECT_API),
+          axios.get(API.GET_OBJECTTYPE_API),
+          axios.get(API.GET_STAKEHOLDER_API),
+          axios.get(API.GET_TECHNOLOGY_API),
+          axios.get(API.GET_ENVIRONMENT_API),
+          axios.get(API.GET_THEMEMASTER_API),
+          axios.get(API.GET_THEMEACTIVITY_API),
+          // axios.get(API.GET_ISSUE_API),
+          axios.get(API.GET_PROJECTCATEGORY_API),
+          axios.get(API.GET_PROJECTTYPE_API),
+        ]);
+
+        setRespGroup(respGroupData.data);
+        setRespCenter(respCenterData.data);
+        setObject(objectName.data);
+        setObjectType(objectType.data);
+        setStake(stakeData.data);
+        setTech(techData.data);
+        setEnv(envData.data);
+        setThem(themData.data);
+        setThemActivity(themActivityData.data);
+        // setIsue(isueData.data);
+        setProj(projData.data);
+        setProjectType(projectTypeData.data);
+      } catch (error) {
+        console.error(error);
+        toast.error("An error occurred while fetching data");
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setState({ ...state, [name]: value });
@@ -115,13 +180,7 @@ const AddEditProjectDetails = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (
-      !organization ||
-      !projectname ||
-      !projectcode ||
-      !auditdate ||
-      !audittime
-    ) {
+    if (!projectname || !projectcode || !auditdate || !audittime) {
       toast.error("Please provide all the required fields");
     } else {
       const payload = {
@@ -151,7 +210,13 @@ const AddEditProjectDetails = () => {
           .then(() => {
             setState(initialState);
             toast.success("Project Details Added");
-            setTimeout(() => navigate("/projectdetails"), 500);
+            setTimeout(
+              () =>
+                navigate("/projectdetails", {
+                  state: { userId, organizationName },
+                }),
+              500
+            );
           })
           .catch((err) => toast.error(err.response.data));
       } else {
@@ -160,7 +225,13 @@ const AddEditProjectDetails = () => {
           .then(() => {
             setState(initialState);
             toast.success("Project Details Updated");
-            setTimeout(() => navigate("/projectdetails"), 500);
+            setTimeout(
+              () =>
+                navigate("/projectdetails", {
+                  state: { userId, organizationName: organization },
+                }),
+              500
+            );
           })
           .catch((err) => toast.error(err.response.data));
       }
@@ -186,6 +257,7 @@ const AddEditProjectDetails = () => {
                 value={organization || ""}
                 onChange={handleInputChange}
                 className="add-edit-project-input"
+                disabled
               />
             </div>
             <div>
@@ -246,127 +318,153 @@ const AddEditProjectDetails = () => {
               <label htmlFor="objecttype" className="add-edit-project-label">
                 Object Type
               </label>
-              <input
-                type="text"
+              <select
                 id="objecttype"
                 name="objecttype"
-                placeholder="Enter the Object Type"
                 value={objecttype || ""}
                 onChange={handleInputChange}
                 className="add-edit-project-input"
-              />
+              >
+                <option value="">Select Object Type</option>
+                {objType.map((item) => (
+                  <option key={item.objecttypeid} value={item.objecttype}>
+                    {item.objecttype}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label htmlFor="object" className="add-edit-project-label">
                 Object
               </label>
-              <input
-                type="text"
+              <select
                 id="object"
                 name="object"
-                placeholder="Enter the Object"
                 value={object || ""}
                 onChange={handleInputChange}
                 className="add-edit-project-input"
-              />
+              >
+                <option value="">Select Object</option>
+                {Obj.map((item) => (
+                  <option key={item.objectid} value={item.objectname}>
+                    {item.objectname}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label htmlFor="stakeholder" className="add-edit-project-label">
                 Stakeholder
               </label>
-              <input
-                type="text"
+              <select
                 id="stakeholder"
                 name="stakeholder"
-                placeholder="Enter the Stakeholder"
                 value={stakeholder || ""}
                 onChange={handleInputChange}
                 className="add-edit-project-input"
-              />
+              >
+                <option value="">Select Stakeholder</option>
+                {stake.map((item) => (
+                  <option key={item.stakeholderid} value={item.stakeholdername}>
+                    {item.stakeholdername}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label htmlFor="technology" className="add-edit-project-label">
                 Technology
               </label>
-              <input
-                type="text"
+              <select
                 id="technology"
                 name="technology"
-                placeholder="Enter the Technology"
                 value={technology || ""}
                 onChange={handleInputChange}
                 className="add-edit-project-input"
-              />
+              >
+                <option value="">Select Technology</option>
+                {tech.map((item) => (
+                  <option key={item.technologyid} value={item.technologyname}>
+                    {item.technologyname}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label htmlFor="environment" className="add-edit-project-label">
                 Environment
               </label>
-              <input
-                type="text"
+              <select
                 id="environment"
                 name="environment"
-                placeholder="Enter the Environment"
                 value={environment || ""}
                 onChange={handleInputChange}
                 className="add-edit-project-input"
-              />
+              >
+                <option value="">Select Environment</option>
+                {env.map((item) => (
+                  <option key={item.environmentid} value={item.environmentname}>
+                    {item.environmentname}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label htmlFor="theme" className="add-edit-project-label">
                 Theme
               </label>
-              <input
-                type="text"
+              <select
                 id="theme"
                 name="theme"
-                placeholder="Enter the Theme"
                 value={theme || ""}
                 onChange={handleInputChange}
                 className="add-edit-project-input"
-              />
+              >
+                <option value="">Select Theme</option>
+                {them.map((item) => (
+                  <option key={item.thememasterid} value={item.themename}>
+                    {item.themename}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label htmlFor="themeactivity" className="add-edit-project-label">
                 Theme Activity
               </label>
-              <input
-                type="text"
+              <select
                 id="themeactivity"
                 name="themeactivity"
-                placeholder="Enter the Theme Activity"
                 value={themeactivity || ""}
                 onChange={handleInputChange}
                 className="add-edit-project-input"
-              />
+              >
+                <option value="">Select Theme Activity</option>
+                {themActivity.map((item) => (
+                  <option key={item.themeactivityid} value={item.activity}>
+                    {item.activity}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label htmlFor="issue" className="add-edit-project-label">
                 Issue
               </label>
-              <input
-                type="text"
+              <select
                 id="issue"
                 name="issue"
-                placeholder="Enter the Issue"
                 value={issue || ""}
                 onChange={handleInputChange}
                 className="add-edit-project-input"
-              />
-            </div>
-            <div>
-              <label htmlFor="project_type" className="add-edit-project-label">
-                Project Type
-              </label>
-              <input
-                type="text"
-                id="project_type"
-                name="project_type"
-                placeholder="Enter the Project Type"
-                value={project_type || ""}
-                onChange={handleInputChange}
-                className="add-edit-project-input"
-              />
+              >
+                <option value="">Select Issue</option>
+                {isue.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label
@@ -375,15 +473,42 @@ const AddEditProjectDetails = () => {
               >
                 Project Category
               </label>
-              <input
-                type="text"
+              <select
                 id="project_category"
                 name="project_category"
-                placeholder="Enter the Project Category"
                 value={project_category || ""}
                 onChange={handleInputChange}
                 className="add-edit-project-input"
-              />
+              >
+                <option value="">Select Project Category</option>
+                {proj.map((item) => (
+                  <option
+                    key={item.projectcategoryid}
+                    value={item.projectcategory}
+                  >
+                    {item.projectcategory}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="project_type" className="add-edit-project-label">
+                Project Type
+              </label>
+              <select
+                id="project_type"
+                name="project_type"
+                value={project_type || ""}
+                onChange={handleInputChange}
+                className="add-edit-project-input"
+              >
+                <option value="">Select Project Type</option>
+                {projectType.map((item) => (
+                  <option key={item.projecttypeid} value={item.projecttype}>
+                    {item.projecttype}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label
@@ -392,15 +517,24 @@ const AddEditProjectDetails = () => {
               >
                 Responsibility Center
               </label>
-              <input
-                type="text"
+              <select
+                style={{ fontFamily: "Poppins" }}
                 id="responsibilitycenter"
                 name="responsibilitycenter"
-                placeholder="Enter the Responsibility Center"
                 value={responsibilitycenter || ""}
                 onChange={handleInputChange}
-                className="add-edit-project-input"
-              />
+                className="add-edit-project-select"
+              >
+                <option value="">Responsibilty Center</option>
+                {respCenter.map((respcenter) => (
+                  <option
+                    key={respcenter.responsibilitycenterid}
+                    value={respcenter.responsibilitycentername}
+                  >
+                    {respcenter.responsibilitycentername}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label
@@ -409,15 +543,24 @@ const AddEditProjectDetails = () => {
               >
                 Responsibility Group
               </label>
-              <input
-                type="text"
+              <select
+                style={{ fontFamily: "Poppins" }}
                 id="responsibilitygroup"
                 name="responsibilitygroup"
-                placeholder="Enter the Responsibility Group"
                 value={responsibilitygroup || ""}
                 onChange={handleInputChange}
-                className="add-edit-project-input"
-              />
+                className="add-edit-project-select"
+              >
+                <option value="">Responsibilty Group</option>
+                {respGroup.map((respgroup) => (
+                  <option
+                    key={respgroup.responsibilitygroupid}
+                    value={respgroup.responsibilitygroupname}
+                  >
+                    {respgroup.responsibilitygroupname}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
           <div>
@@ -426,7 +569,11 @@ const AddEditProjectDetails = () => {
               type="submit"
               value={projectdetailsid ? "Update" : "Save"}
             />
-            <Link to="/projectdetails" className="add-edit-project-link">
+            <Link
+              to="/projectdetails"
+              state={{ userId, organizationName }}
+              className="add-edit-project-link"
+            >
               <input
                 className="btn btn-round btn-signup"
                 type="button"
