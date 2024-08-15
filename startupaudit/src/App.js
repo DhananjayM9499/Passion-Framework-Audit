@@ -56,6 +56,7 @@ import Assessment from "./startup/GovernanceAudit/Assessment/Assessment";
 import AddEditAssessment from "./startup/GovernanceAudit/Assessment/AddEditAssessment";
 import Audit from "./startup/GovernanceAudit/Audit/Audit";
 import AddEditAudit from "./startup/GovernanceAudit/Audit/AddEditAudit";
+import HomePage from "./startup/components/HomePage/HomePage";
 
 function App() {
   return (
@@ -75,7 +76,7 @@ function App() {
             />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-
+            <Route path="/" element={<HomePage />} />
             {/**********************************************Organization URLS********************************************* */}
             <Route
               path="/organization"
