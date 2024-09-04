@@ -237,12 +237,13 @@ const AuditScoreData = ({ item, onClose }) => {
             <strong>Auditor : </strong> <span>{item.auditor}</span>
           </li>
           <li>
-            <strong>Auditees : </strong> <span>{item.auditees.join(", ")}</span>
+            <strong>Auditees: </strong>{" "}
+            <span>{item.auditees ? item.auditees.join(", ") : "NA"}</span>
           </li>
 
           <li>
             <strong>From Date : </strong>{" "}
-            <span>{new Date(item.fromdate).toLocaleDateString()}</span>
+            <span>{new Date(item.fromdate).toLocaleDateString() || "NA"}</span>
           </li>
           <li>
             <strong>To Date : </strong>{" "}
@@ -250,29 +251,33 @@ const AuditScoreData = ({ item, onClose }) => {
           </li>
           <li>
             <strong>Auditor Company : </strong>{" "}
-            <span>{item.auditorcompany}</span>
+            <span>{item.auditorcompany || "NA"}</span>
           </li>
         </ul>
         <ul>
           <li>
             <strong>Audit Reference Link : </strong>{" "}
-            <span>{item.auditreferencelink}</span>
+            <span>{item.auditreferencelink || "NA"}</span>
           </li>
           <li>
-            <strong>Audit Upload : </strong> <span>{item.auditupload}</span>
+            <strong>Audit Upload : </strong>{" "}
+            <span>{item.auditupload || "NA"}</span>
           </li>
           <li>
-            <strong>Audit Remark : </strong> <span>{item.auditremark}</span>
+            <strong>Audit Remark : </strong>{" "}
+            <span>{item.auditremark || "NA"}</span>
           </li>
           <li>
-            <strong>Audit Status : </strong> <span>{item.auditstatus}</span>
+            <strong>Audit Status : </strong>{" "}
+            <span>{item.auditstatus || "NA"}</span>
           </li>
           <li>
-            <strong>Audit Score : </strong> <span>{item.auditscore}</span>
+            <strong>Audit Score : </strong>{" "}
+            <span>{item.auditscore || "NA"}</span>
           </li>
           <li>
             <strong>Audit Date : </strong>{" "}
-            <span>{new Date(item.auditdate).toLocaleDateString()}</span>
+            <span>{new Date(item.auditdate).toLocaleDateString() || "NA"}</span>
           </li>
         </ul>
       </div>
