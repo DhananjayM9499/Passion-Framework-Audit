@@ -1,11 +1,12 @@
 const BASE_URL = "http://localhost:5009/startup-api/";
+//const BASE_URL = "https://audit1.passionit.com/startup-api/startup-api/";
 
 export const LOGIN = `${BASE_URL}login`;
 export const SIGNUP = `${BASE_URL}signup`;
 
 /****************ORGANIZATION******************* */
 export const GET_ORGANIZATION_API = (user_id) =>
-  `${BASE_URL}organization/${user_id}`;
+  `${BASE_URL}userOrganization/${user_id}`;
 
 export const DELETE_ORGANIZATION_API = (organizationid) =>
   `${BASE_URL}organization/${organizationid}`;
@@ -156,7 +157,7 @@ export const GET_SPECIFIC_GOVERNANCECONTROL = (controlid) =>
 export const UPDATE_SPECIFIC_GOVERNANCECONTROL = (controlid) =>
   `${BASE_URL}governancecontrol/${controlid}`;
 
-/*****************************GOVERNANCE CONTROL********************************************************** */
+/*****************************PROJECT DETAILS********************************************************** */
 export const POST_PROJECTDETAILS_API = `${BASE_URL}projectdetails`;
 export const GET_PROJECTDETAILS_API = `${BASE_URL}projectdetails`;
 export const DELETE_PROJECTDETAILS_API = (projectdetailsid) =>
@@ -167,6 +168,8 @@ export const GET_PROJECTDETAILS_BYID = (user_id, organization) =>
   `${BASE_URL}projectdetails/${user_id}/${organization}`;
 export const UPDATE_SPECIFIC_PROJECTDETAILS = (projectdetailsid) =>
   `${BASE_URL}projectdetails/${projectdetailsid}`;
+export const GET_PROJECTDETAILS_USERID = (user_id) =>
+  `${BASE_URL}userprojectdetails/${user_id}`;
 /*****************************OBJECT TYPE********************************************************** */
 export const POST_OBJECTTYPE_API = `${BASE_URL}objecttype`;
 export const GET_OBJECTTYPE_API = `${BASE_URL}objecttype`;
@@ -215,5 +218,23 @@ export const GET_SPECIFIC_AUDIT = (governanceauditid) =>
   `${BASE_URL}governanceaudit/${governanceauditid}`;
 export const UPDATE_SPECIFIC_AUDIT = (governanceauditid) =>
   `${BASE_URL}governanceaudit/${governanceauditid}`;
-export const GET_AUDIT_BYUSERID = (user_id, assessmentid) =>
-  `${BASE_URL}governanceaudit/${user_id}/${assessmentid}`;
+export const GET_AUDIT_BYUSERID = (user_id, auditplanid) =>
+  `${BASE_URL}governanceaudit/${user_id}/${auditplanid}`;
+/************************************AUDIT PLAN************************************************ */
+export const POST_AUDITPLAN_API = `${BASE_URL}auditplan`;
+export const GET_AUDITPLAN_API = `${BASE_URL}auditplan`;
+export const DELETE_AUDITPLAN_API = (auditplanid) =>
+  `${BASE_URL}auditplan/${auditplanid}`;
+export const GET_SPECIFIC_AUDITPLAN = (auditplanid) =>
+  `${BASE_URL}auditplan/${auditplanid}`;
+export const UPDATE_SPECIFIC_AUDITPLAN = (auditplanid) =>
+  `${BASE_URL}auditplan/${auditplanid}`;
+export const GET_AUDITPLAN_BYUSERID = (user_id, assessmentid) =>
+  `${BASE_URL}auditplan/${user_id}/${assessmentid}`;
+export const GET_USER_AUDITPLAN = (user_id) =>
+  `${BASE_URL}userauditplan/${user_id}`;
+/********************************SCORE CARD************************************************ */
+export const GET_SCORECARD_API = (user_id) => `${BASE_URL}scorecard/${user_id}`;
+export const RESET_PASSWORD_API = `${BASE_URL}reset-password`;
+export const VALIDATE_TOKEN_API = `${BASE_URL}validate-reset-token`;
+export const UPDATE_PASSWORD_API = `${BASE_URL}password`;

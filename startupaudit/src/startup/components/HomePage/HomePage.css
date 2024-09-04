@@ -45,6 +45,7 @@
       format("truetype"),
     url("https://db.onlinewebfonts.com/t/7583a571c6edf39e350bac12619613b5.svg#Arian LT Bold")
       format("svg");
+  font-display: swap;
 }
 
 @font-face {
@@ -60,6 +61,7 @@
       format("truetype"),
     url("https://db.onlinewebfonts.com/t/1f483bd09c2e0a8024986b03d115f4e3.svg#Arian LT Demi")
       format("svg");
+  font-display: swap;
 }
 
 /* Apply the font to the title */

@@ -1,0 +1,30 @@
+/* Add this style to your CSS file or style block */
+
+/* Adjust the size of the Pie Chart container */
+div .chart-container {
+  max-width: 300px; /* Set your preferred max width */
+  margin: auto;
+}
+
+/* Style the Pie Chart legend */
+div .legend {
+  list-style: none;
+  padding: 0;
+  text-align: center;
+}
+
+div .legend li {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+div .legend span {
+  display: inline-block;
+  width: 12px; /* Adjust the width of the color indicator */
+  height: 12px; /* Adjust the height of the color indicator */
+  margin-right: 5px;
+}
+label {
+  color: black;
+  font-weight: 600;
+}

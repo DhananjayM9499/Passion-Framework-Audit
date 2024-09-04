@@ -9,6 +9,7 @@ import logo from "../images/logo.png";
 import * as API from "../../Endpoints/Endpoints";
 
 function Signup() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -16,7 +17,7 @@ function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password || !confirmPassword) {
+    if (!name || !email || !password || !confirmPassword) {
       toast.error("Please fill all the fields");
     } else {
       if (password !== confirmPassword) {
@@ -27,7 +28,7 @@ function Signup() {
         const response = await fetch(API.SIGNUP, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ name, email, password }),
         });
         const data = await response.json();
         if (response.ok) {
@@ -61,6 +62,13 @@ function Signup() {
                 </p>
                 <form onSubmit={handleSubmit}>
                   <div className="text-box-cont">
+                    <input
+                      type="name"
+                      className="form-control"
+                      placeholder="Name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
                     <input
                       type="email"
                       className="form-control"

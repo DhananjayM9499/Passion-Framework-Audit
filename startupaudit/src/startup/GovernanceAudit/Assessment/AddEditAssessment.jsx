@@ -14,7 +14,7 @@ const initialState = {
 };
 
 const AddEditAssessment = () => {
-  const userId = localStorage.getItem("user_id");
+  const userId = sessionStorage.getItem("user_id");
   const location = useLocation();
   const { projectId, evidenceId } = location.state || {};
   const { assessmentid } = useParams();
@@ -377,7 +377,7 @@ const AddEditAssessment = () => {
                   >
                     Assessment Status
                   </label>
-                  <input
+                  <select
                     type="text"
                     id="assessmentstatus"
                     name="assessmentstatus"
@@ -385,7 +385,22 @@ const AddEditAssessment = () => {
                     onChange={handleInputChange}
                     className="add-edit-project-input"
                     placeholder="Enter assessment status"
-                  />
+                  >
+                    <option value="">Select Status</option>
+                    <option value="Fully Compliant">
+                      Fully Compliant
+                    </option>{" "}
+                    <option value="Major Non-Compliant">
+                      Major Non-Compliant
+                    </option>{" "}
+                    <option value="Minor Non-Compliant">
+                      Minor Non-Compliant
+                    </option>
+                    <option value="Observation">Observation</option>
+                    <option value="Suggestions">Suggestions</option>
+                    <option value="Not Applicable">Not Applicable</option>
+                    <option value="On Hold">On Hold</option>
+                  </select>
                 </div>
                 <div>
                   <label

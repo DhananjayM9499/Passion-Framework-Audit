@@ -9,11 +9,13 @@ import Pagination from "../../components/Pagination/Pagination";
 import { toast } from "react-toastify";
 import { useProjectDetails } from "../../components/Hooks/useProjectDetails";
 import { useOrganizationDetails } from "../../components/Hooks/useOrganizationDetails";
+import NoDataAvailable from "../../components/NoDataAvailable/NoDataAvailable";
 
 const Audit = () => {
-  const userId = localStorage.getItem("user_id");
+  const userId = sessionStorage.getItem("user_id");
   const location = useLocation();
-  const { projectId, evidenceId, assessmentId } = location.state || {};
+  const { projectId, evidenceId, assessmentId, auditPlanId } =
+    location.state || {};
 
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -64,7 +66,7 @@ const Audit = () => {
   const loadAudit = async () => {
     try {
       const response = await axios.get(
-        API.GET_AUDIT_BYUSERID(userId, assessmentId)
+        API.GET_AUDIT_BYUSERID(userId, auditPlanId)
       );
       const sortedData = response.data.sort(
         (a, b) => b.governanceauditid - a.governanceauditid
@@ -78,7 +80,16 @@ const Audit = () => {
   const formatDate = (dateString) => {
     if (dateString) {
       const date = new Date(dateString);
-      return isNaN(date.getTime()) ? "Invalid Date" : date.toLocaleDateString();
+      if (isNaN(date.getTime())) {
+        return "Invalid Date";
+      }
+      // Extract day, month, and year parts
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+      const year = date.getFullYear();
+
+      // Return the formatted date as dd/mm/yyyy
+      return `${day}/${month}/${year}`;
     }
     return "N/A";
   };
@@ -110,6 +121,15 @@ const Audit = () => {
       return formattedTime;
     }
     return "N/A";
+  };
+
+  const calculateNextAuditDate = (auditDate) => {
+    if (!auditDate) return "N/A"; // Handle if the auditDate is not available
+    const date = new Date(auditDate);
+    date.setDate(date.getDate() + 180); // Add 180 days
+    return isNaN(date.getTime())
+      ? "Invalid Date"
+      : date.toLocaleDateString("en-GB"); // Format the date as dd/mm/yyyy
   };
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -295,7 +315,7 @@ const Audit = () => {
           <div className="mb-4 d-flex justify-content-end mt-4">
             <Link
               to="/audit/add"
-              state={{ projectId, assessmentId, evidenceId }}
+              state={{ projectId, assessmentId, evidenceId, auditPlanId }}
             >
               <div className="input-group center">
                 <button className="btn btn-round btn-signup">Add Audit</button>
@@ -315,57 +335,73 @@ const Audit = () => {
                   <th scope="col">Audit Remark</th>
                   <th scope="col">Audit Status</th>
                   <th scope="col">Audit Score</th>
+                  <th scope="col">Audit Date</th>
+                  <th scope="col">Audit Validity Date</th>
+                  <th scope="col">Next Audit Date </th>
                   <th scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {audit.map((item, index) => (
-                  <tr key={item.governanceauditid}>
-                    <td>{index + indexOfFirstItem + 1}</td>
-                    <td>
-                      <a
-                        style={{ color: "blue" }}
-                        href={item.auditreferencelink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {item.auditreferencelink}
-                      </a>
-                    </td>
-                    <td>{item.auditupload}</td>
-                    <td>{item.auditremark}</td>
-                    <td>{item.auditstatus}</td>
-                    <td>{item.auditscore}</td>
-                    <td>
-                      <Link
-                        to={`/audit/${item.governanceauditid}`}
-                        state={{ projectId, assessmentId, evidenceId }}
-                      >
-                        <FaEdit size={24} />
-                      </Link>
+                {audit.length === 0 ? (
+                  <NoDataAvailable />
+                ) : (
+                  audit.map((item, index) => (
+                    <tr key={item.governanceauditid}>
+                      <td>{index + indexOfFirstItem + 1}</td>
+                      <td>
+                        <a
+                          style={{ color: "blue" }}
+                          href={item.auditreferencelink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {item.auditreferencelink}
+                        </a>
+                      </td>
+                      <td>{item.auditupload}</td>
+                      <td>{item.auditremark}</td>
+                      <td>{item.auditstatus}</td>
+                      <td>{item.auditscore}</td>
+                      <td>{formatDate(item.auditdate)}</td>
+                      <td>{formatDate(item.auditreportexpirydate)}</td>
+                      <td>{calculateNextAuditDate(item.auditdate)}</td>
+                      <td>
+                        <Link
+                          to={`/audit/${item.governanceauditid}`}
+                          state={{
+                            projectId,
+                            assessmentId,
+                            evidenceId,
+                            auditPlanId,
+                          }}
+                        >
+                          <FaEdit size={24} />
+                        </Link>
 
-                      <MdDelete
-                        size={24}
-                        onClick={() => deleteAudit(item.governanceauditid)}
-                        style={{ cursor: "pointer", marginLeft: "10px" }}
-                      />
-                      <Link
-                        to="/audit"
-                        state={{
-                          projectId,
-                          evidenceId,
-                          assessmentId: item.assessmentid,
-                        }}
-                      >
-                        <div>
-                          <button className="btn btn-round btn-signup ml-2">
-                            View Audit Details
-                          </button>
-                        </div>
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
+                        <MdDelete
+                          size={24}
+                          onClick={() => deleteAudit(item.governanceauditid)}
+                          style={{ cursor: "pointer", marginLeft: "10px" }}
+                        />
+                        <Link
+                          to="/audit"
+                          state={{
+                            projectId,
+                            evidenceId,
+                            assessmentId,
+                            auditPlanId,
+                          }}
+                        >
+                          <div>
+                            <button className="btn btn-round btn-signup ml-2">
+                              View Audit Details
+                            </button>
+                          </div>
+                        </Link>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { IconContext } from "react-icons";
 import { VscAccount } from "react-icons/vsc";
@@ -9,6 +9,8 @@ import "./Navbar.css";
 import { toast } from "react-toastify";
 import { SidebarData } from "./SidebarData";
 import { FaBars, FaCaretDown } from "react-icons/fa";
+import { IoLogOutOutline } from "react-icons/io5";
+import { MdManageAccounts } from "react-icons/md";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -16,9 +18,11 @@ function Navbar() {
   const [email, setEmail] = useState("");
   const [sidebar, setSidebar] = useState(false);
   const [subNav, setSubNav] = useState({});
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
@@ -32,11 +36,16 @@ function Navbar() {
   const handleLogoutClick = () => {
     const userConfirmed = window.confirm("Are you sure you want to logout?");
     if (userConfirmed) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user_id");
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("user_id");
       toast.success("Logged out successfully");
       navigate("/login");
     }
+  };
+
+  const handleProfileClick = () => {
+    // Navigate to the profile page
+    navigate("/profile"); // Adjust the path as needed
   };
 
   const toggleSidebar = () => {
@@ -49,6 +58,24 @@ function Navbar() {
       [index]: !prevSubNav[index],
     }));
   };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen((prevState) => !prevState); // Toggle state
+  };
+
+  // Close the dropdown if the user clicks outside of it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Determine the name of the active route
   const routeNames = {
@@ -116,6 +143,10 @@ function Navbar() {
     "/audit": "Audit",
     "/audit/add": "Audit",
     "/audit/:governanceauditid": "Audit",
+    "/auditplan": "Audit Plan",
+    "/auditplan/add": "Audit plan",
+    "/auditplan/:auditplanid": "Audit Plan",
+    "/auditscore": "Audit Score",
   };
 
   const activeRoute = routeNames[location.pathname] || "Home";
@@ -125,18 +156,42 @@ function Navbar() {
       <IconContext.Provider value={{ color: "#ff3131" }}>
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
           <div className="container">
-            {" "}
             <Link to="/home" className="navbar-brand">
               <img src={logo} width="70px" height="auto" alt="logo" />
             </Link>
             <div className="active-route">{activeRoute}</div>{" "}
             {/* Display active route */}
-            <div className="account-section" onClick={handleLogoutClick}>
+            <div
+              className="account-section"
+              onClick={toggleDropdown}
+              ref={dropdownRef}
+            >
+              {/* Account icon and dropdown toggle */}
               <IconContext.Provider value={{ size: 24, color: "#ff3131" }}>
                 <VscAccount />
-              </IconContext.Provider>
-              <span className="email-text ml-4 ">{email}</span>
-              <div className="account-icon" onClick={handleLogoutClick}></div>
+              </IconContext.Provider>{" "}
+              &nbsp;
+              <span className="email-text ml-4">{email}</span>
+              {isDropdownOpen && (
+                <div className="dropdown-menu show mt-2">
+                  {" "}
+                  {/* Add show class conditionally */}
+                  <div className="dropdown-item" onClick={handleProfileClick}>
+                    Profile{" "}
+                    <MdManageAccounts
+                      size={24}
+                      style={{ cursor: "pointer", marginLeft: "10px" }}
+                    />
+                  </div>
+                  <div className="dropdown-item" onClick={handleLogoutClick}>
+                    Logout{" "}
+                    <IoLogOutOutline
+                      size={24}
+                      style={{ cursor: "pointer", marginLeft: "10px" }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
             <div className="menu-icon" onClick={toggleSidebar}>
               <FaBars />

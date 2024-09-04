@@ -15,9 +15,11 @@ const initialState = {
 };
 
 const AddEditAudit = () => {
-  const userId = localStorage.getItem("user_id");
+  const userId = sessionStorage.getItem("user_id");
   const location = useLocation();
-  const { projectId, evidenceId, assessmentId } = location.state || {};
+  const { projectId, evidenceId, assessmentId, auditPlanId } =
+    location.state || {};
+  console.log(auditPlanId);
   const [data, setData] = useState([]);
   const [organization, setOrganization] = useState({});
   const [error, setError] = useState(null);
@@ -27,6 +29,7 @@ const AddEditAudit = () => {
   const itemsPerPage = 3;
   const [state, setState] = useState([]);
   const { governanceauditid } = useParams();
+  console.log(auditPlanId);
   const navigate = useNavigate();
   useEffect(() => {
     if (projectId) {
@@ -81,7 +84,9 @@ const AddEditAudit = () => {
 
   useEffect(() => {
     loadData();
-    loadAudit();
+    if (governanceauditid) {
+      loadAudit();
+    }
   }, [userId]); // Added organizationName to dependency array
 
   const loadData = async () => {
@@ -151,6 +156,7 @@ const AddEditAudit = () => {
       auditscore,
     } = audit;
 
+    // Check if required fields are filled
     if (
       !auditreferencelink ||
       !auditupload ||
@@ -162,16 +168,30 @@ const AddEditAudit = () => {
       return;
     }
 
+    // Set auditdate and auditreportexpirydate
+    const auditdate = new Date(); // Current date and time
+    const auditreportexpirydate = new Date(
+      auditdate.getTime() + 1000 * 24 * 60 * 60 * 1000
+    ); // 1000 days from the current date
+
     try {
       const apiEndpoint = governanceauditid
         ? API.UPDATE_SPECIFIC_AUDIT(governanceauditid)
         : API.POST_AUDIT_API;
       const method = governanceauditid ? axios.put : axios.post;
-      const response = await method(apiEndpoint, {
+
+      // Prepare the data to be sent, including the new date fields
+      const dataToSend = {
         ...audit,
+        auditdate,
+        auditreportexpirydate,
         assessmentid: assessmentId,
         user_id: userId,
-      });
+        auditplanid: auditPlanId,
+      };
+
+      // Send the request
+      const response = await method(apiEndpoint, dataToSend);
 
       if (response.status === 200) {
         toast.success(
@@ -183,17 +203,24 @@ const AddEditAudit = () => {
         setTimeout(
           () =>
             navigate("/audit", {
-              state: { userId, evidenceId, projectId, assessmentId },
+              state: {
+                userId,
+                evidenceId,
+                projectId,
+                assessmentId,
+                auditPlanId,
+              },
             }),
           500
         );
       } else {
-        toast.error("Failed to save Audit .");
+        toast.error("Failed to save Audit.");
       }
     } catch (err) {
       toast.error("An error occurred: " + err.message);
     }
   };
+
   return (
     <div className="evidence-page">
       {/* Uncomment Navbar if needed */}
@@ -413,7 +440,7 @@ const AddEditAudit = () => {
                   >
                     Audit Status
                   </label>
-                  <input
+                  <select
                     type="text"
                     id="auditstatus"
                     name="auditstatus"
@@ -421,7 +448,22 @@ const AddEditAudit = () => {
                     onChange={handleInputChange}
                     className="add-edit-project-input"
                     placeholder="Enter audit status"
-                  />
+                  >
+                    <option value="">Select Status</option>
+                    <option value="Fully Compliant">
+                      Fully Compliant
+                    </option>{" "}
+                    <option value="Major Non-Compliant">
+                      Major Non-Compliant
+                    </option>{" "}
+                    <option value="Minor Non-Compliant">
+                      Minor Non-Compliant
+                    </option>
+                    <option value="Observation">Observation</option>
+                    <option value="Suggestions">Suggestions</option>
+                    <option value="Not Applicable">Not Applicable</option>
+                    <option value="On Hold">On Hold</option>
+                  </select>
                 </div>
                 <div>
                   <label
@@ -466,7 +508,7 @@ const AddEditAudit = () => {
                 />
                 <Link
                   to="/audit"
-                  state={{ evidenceId, projectId, assessmentId }}
+                  state={{ evidenceId, projectId, assessmentId, auditPlanId }}
                   className="add-edit-project-link"
                 >
                   <input

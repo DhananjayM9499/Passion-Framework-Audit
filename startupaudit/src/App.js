@@ -57,6 +57,12 @@ import AddEditAssessment from "./startup/GovernanceAudit/Assessment/AddEditAsses
 import Audit from "./startup/GovernanceAudit/Audit/Audit";
 import AddEditAudit from "./startup/GovernanceAudit/Audit/AddEditAudit";
 import HomePage from "./startup/components/HomePage/HomePage";
+import Test from "./startup/test/Test";
+import AuditPlan from "./startup/GovernanceAudit/AuditPlan/AuditPlan";
+import AddEditAuditPlan from "./startup/GovernanceAudit/AuditPlan/AddEditAuditPlan";
+import AuditScore from "./startup/GovernanceAudit/AuditScore/AuditScore";
+import ForgotPassword from "./startup/components/ForgotPassword/ForgotPassword";
+import ResetPassword from "./startup/components/ForgotPassword/ResetPassword";
 
 function App() {
   return (
@@ -77,6 +83,9 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/" element={<HomePage />} />
+            <Route path="/forgotpassword" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
+
             {/**********************************************Organization URLS********************************************* */}
             <Route
               path="/organization"
@@ -621,6 +630,41 @@ function App() {
                 </PrivateRoute>
               }
             />
+            {/******************************************AUDIT URLS***************************************************** */}
+            <Route
+              path="/auditplan"
+              element={
+                <PrivateRoute>
+                  <AuditPlan />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/auditplan/add"
+              element={
+                <PrivateRoute>
+                  <AddEditAuditPlan />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/auditplan/:auditplanid"
+              element={
+                <PrivateRoute>
+                  <AddEditAuditPlan />
+                </PrivateRoute>
+              }
+            />
+            {/*****************************************************AUDIT SCORE*************************************************** */}
+            <Route
+              path="/auditscore"
+              element={
+                <PrivateRoute>
+                  <AuditScore />
+                </PrivateRoute>
+              }
+            />
+            <Route path="/test" element={<Test />} />
           </Routes>
         </div>
       </Router>

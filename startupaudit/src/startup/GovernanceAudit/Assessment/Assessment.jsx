@@ -9,9 +9,10 @@ import Pagination from "../../components/Pagination/Pagination";
 import { toast } from "react-toastify";
 import { useProjectDetails } from "../../components/Hooks/useProjectDetails";
 import { useOrganizationDetails } from "../../components/Hooks/useOrganizationDetails";
+import NoDataAvailable from "../../components/NoDataAvailable/NoDataAvailable";
 
 const Assessment = () => {
-  const userId = localStorage.getItem("user_id");
+  const userId = sessionStorage.getItem("user_id");
   const location = useLocation();
   const { projectId, evidenceId } = location.state || {};
 
@@ -284,53 +285,58 @@ const Assessment = () => {
                 </tr>
               </thead>
               <tbody>
-                {assess.map((item, index) => (
-                  <tr key={item.evidenceid}>
-                    <td>{index + indexOfFirstItem + 1}</td>
-                    <td>
-                      <a
-                        style={{ color: "blue" }}
-                        href={item.assessmentreferencelink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {item.assessmentreferencelink}
-                      </a>
-                    </td>
-                    <td>{item.assessmentupload}</td>
-                    <td>{item.assessmentremark}</td>
-                    <td>{item.assessmentstatus}</td>
-                    <td>{item.assessmentscore}</td>
-                    <td>
-                      <Link
-                        to={`/assessment/${item.assessmentid}`}
-                        state={{ projectId, evidenceId }}
-                      >
-                        <FaEdit size={24} />
-                      </Link>
+                {assess.length === 0 ? (
+                  <NoDataAvailable />
+                ) : (
+                  assess.map((item, index) => (
+                    <tr key={item.evidenceid}>
+                      <td>{index + indexOfFirstItem + 1}</td>
+                      <td>
+                        <a
+                          style={{ color: "blue" }}
+                          href={item.assessmentreferencelink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {item.assessmentreferencelink}
+                        </a>
+                      </td>
+                      <td>{item.assessmentupload}</td>
+                      <td>{item.assessmentremark}</td>
+                      <td>{item.assessmentstatus}</td>
+                      <td>{item.assessmentscore}</td>
+                      <td>
+                        <Link
+                          to={`/assessment/${item.assessmentid}`}
+                          state={{ projectId, evidenceId }}
+                        >
+                          <FaEdit size={24} />
+                        </Link>
 
-                      <MdDelete
-                        size={24}
-                        onClick={() => deleteAssessment(item.assessmentid)}
-                        style={{ cursor: "pointer", marginLeft: "10px" }}
-                      />
-                      <Link
-                        to="/audit"
-                        state={{
-                          projectId,
-                          evidenceId,
-                          assessmentId: item.assessmentid,
-                        }}
-                      >
-                        <div>
-                          <button className="btn btn-round btn-signup ml-2">
-                            Audit
-                          </button>
-                        </div>
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
+                        <MdDelete
+                          size={24}
+                          onClick={() => deleteAssessment(item.assessmentid)}
+                          style={{ cursor: "pointer", marginLeft: "10px" }}
+                        />
+                        <Link
+                          to="/auditplan"
+                          state={{
+                            projectId,
+                            evidenceId,
+                            assessmentId: item.assessmentid,
+                            project: data.projectname,
+                          }}
+                        >
+                          <div>
+                            <button className="btn btn-round btn-signup ml-2">
+                              Audit Plan
+                            </button>
+                          </div>
+                        </Link>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

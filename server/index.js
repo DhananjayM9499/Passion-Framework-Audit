@@ -3,17 +3,20 @@ const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-
 const app = express();
-const port = 5009; // Choose your desired port
 app.use(cors());
+require("dotenv").config();
+const nodemailer = require("nodemailer");
+
 // PostgreSQL Connection
+const port = process.env.PORT; // Choose your desired port
+
 const pool = new Pool({
-  user: "postgres",
-  host: "34.71.87.187",
-  database: "startupaudit",
-  password: "India@5555",
-  port: 5432,
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
 });
 const jwt = require("jsonwebtoken");
 // Connect to PostgreSQL
@@ -28,7 +31,7 @@ app.use(bodyParser.json());
 
 // Signup Endpoint
 app.post("/startup-api/signup", async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, name } = req.body;
 
   try {
     // Check if user already exists
@@ -45,8 +48,8 @@ app.post("/startup-api/signup", async (req, res) => {
 
     // Store hashed password in database
     await pool.query(
-      "INSERT INTO startupuser (user_email, user_password) VALUES ($1, $2)",
-      [email, hashedPassword]
+      "INSERT INTO startupuser (user_email, user_password,user_name) VALUES ($1, $2,$3)",
+      [email, hashedPassword, name]
     );
 
     res.status(201).json({ message: "User registered successfully" });
@@ -56,10 +59,42 @@ app.post("/startup-api/signup", async (req, res) => {
   }
 });
 
-// Login Endpoint
+/****************************************UPDATE PASSWORD API************************************************** */
 
-const secretKey = "g63D0b5E4&fU^E#^q2tE8j5#4Z3Kp7@1"; // Replace with your actual secret key
+// Forgot Password API
+app.post("/startup-api/password", async (req, res) => {
+  const { user_id, password } = req.body;
 
+  try {
+    // Fetch the user from the database by user_id
+    const result = await pool.query(
+      "SELECT * FROM startupuser WHERE user_id = $1",
+      [user_id]
+    );
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Hash the new password
+    const hashedNewPassword = await bcrypt.hash(password, 10);
+
+    // Update the password in the database
+    await pool.query(
+      "UPDATE startupuser SET user_password = $1 WHERE user_id = $2",
+      [hashedNewPassword, user_id]
+    );
+
+    res.status(200).json({ message: "Password has been reset successfully" });
+  } catch (err) {
+    console.error("Error resetting password:", err);
+    res.status(500).json({ message: "Error resetting password" });
+  }
+});
+
+/******************************************LOGIN API************************************************* */
+const secretKey = process.env.JWT_SECRET; // Replace with your actual secret key
 // Login Endpoint
 app.post("/startup-api/login", async (req, res) => {
   const { email, password } = req.body;
@@ -98,7 +133,7 @@ app.post("/startup-api/login", async (req, res) => {
 /*******************************************************************OrganizationApi***************************************************************************** */
 
 /*GET ALL Organization */
-app.get("/startup-api/organization/:user_id", (req, res) => {
+app.get("/startup-api/userOrganization/:user_id", (req, res) => {
   const { user_id } = req.params;
   const sqlGet = "SELECT * FROM public.organization where user_id=$1";
   pool.query(sqlGet, [user_id], (error, result) => {
@@ -1412,6 +1447,21 @@ app.get("/startup-api/projectdetails/:projectdetailsid", async (req, res) => {
   }
 });
 //GET PROJECT DETAILS BY USERID
+app.get("/startup-api/userprojectdetails/:user_id", async (req, res) => {
+  try {
+    const { user_id, organization } = req.params;
+    const sqlGet = "SELECT * FROM public.projectdetails WHERE user_id=$1 ";
+    const result = await pool.query(sqlGet, [user_id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+    res.send(result.rows);
+  } catch (error) {
+    console.error("Error fetching project detail:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+//GET PROJECT DETAILS BY ORG AND USER ID
 app.get(
   "/startup-api/projectdetails/:user_id/:organization",
   async (req, res) => {
@@ -1452,6 +1502,7 @@ app.post("/startup-api/projectdetails", async (req, res) => {
     project_category,
     responsibilitycenter,
     responsibilitygroup,
+    organizationid,
   } = req.body;
 
   // Validation
@@ -1462,8 +1513,8 @@ app.post("/startup-api/projectdetails", async (req, res) => {
   try {
     const sqlInsert = `
       INSERT INTO public.projectdetails(
-        organization, projectname, projectcode, auditdate, audittime, objecttype, object, stakeholder, technology, environment, theme, themeactivity, issue, user_id, project_type, project_category, responsibilitycenter, responsibilitygroup
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+        organization, projectname, projectcode, auditdate, audittime, objecttype, object, stakeholder, technology, environment, theme, themeactivity, issue, user_id, project_type, project_category, responsibilitycenter, responsibilitygroup,organizationid
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18,$19)
     `;
     await pool.query(sqlInsert, [
       organization,
@@ -1484,6 +1535,7 @@ app.post("/startup-api/projectdetails", async (req, res) => {
       project_category,
       responsibilitycenter,
       responsibilitygroup,
+      organizationid,
     ]);
     res.status(201).json({ message: "Project detail created successfully" });
   } catch (error) {
@@ -1875,10 +1927,11 @@ app.put("/startup-api/evidence/:evidenceid", (req, res) => {
     evidencereferencelink,
     evidenceremark,
     evidencestatus,
+    uploadevidence,
   } = req.body;
 
   const sqlUpdate =
-    "UPDATE public.evidence SET projectdetailsid = $1, user_id = $2, governancegroup = $3, thrustarea = $4, controlname = $5, controlwt = $6, subcontrolname = $7, subcontrolwt = $8, expectedevidence = $9, evidencereferencelink = $10, evidenceremark = $11, evidencestatus = $12 WHERE evidenceid = $13";
+    "UPDATE public.evidence SET projectdetailsid = $1, user_id = $2, governancegroup = $3, thrustarea = $4, controlname = $5, controlwt = $6, subcontrolname = $7, subcontrolwt = $8, expectedevidence = $9, evidencereferencelink = $10, evidenceremark = $11, evidencestatus = $12,uploadevidence=$13 WHERE evidenceid = $14";
   const values = [
     projectdetailsid,
     user_id,
@@ -1892,6 +1945,7 @@ app.put("/startup-api/evidence/:evidenceid", (req, res) => {
     evidencereferencelink,
     evidenceremark,
     evidencestatus,
+    uploadevidence,
     evidenceid,
   ];
 
@@ -2085,15 +2139,15 @@ app.get("/startup-api/governanceaudit/:governanceauditid", async (req, res) => {
   });
 });
 
-//GET AUDIT BY ID AND ASSESSMENTID
+//GET AUDIT BY ID AND AUDITPLAN ID
 app.get(
-  "/startup-api/governanceaudit/:user_id/:assessmentid",
+  "/startup-api/governanceaudit/:user_id/:auditplanid",
   async (req, res) => {
-    const { user_id, assessmentid } = req.params;
+    const { user_id, auditplanid } = req.params;
     const sqlGet =
-      "SELECT * FROM public.governanceaudit WHERE user_id = $1 AND assessmentid = $2";
+      "SELECT * FROM public.governanceaudit WHERE user_id = $1 AND auditplanid = $2";
 
-    pool.query(sqlGet, [user_id, assessmentid], (error, result) => {
+    pool.query(sqlGet, [user_id, auditplanid], (error, result) => {
       if (error) {
         console.error("Error fetching assessment record", error);
         res.status(500).json({ error: "Internal server error" });
@@ -2114,10 +2168,13 @@ app.post("/startup-api/governanceaudit", async (req, res) => {
     auditremark,
     auditstatus,
     auditscore,
+    auditplanid,
+    auditdate,
+    auditreportexpirydate,
   } = req.body;
 
-  const sqlInsert =
-    "INSERT INTO public.governanceaudit( user_id, assessmentid, auditreferencelink, auditupload, auditremark, auditstatus, auditscore) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *";
+  const sqlInsert = `INSERT INTO public.governanceaudit( user_id, assessmentid, auditreferencelink, auditupload, auditremark, auditstatus, auditscore,auditplanid,auditdate,
+    auditreportexpirydate) VALUES ($1, $2, $3, $4, $5, $6, $7,$8,$9,$10) RETURNING *`;
   const values = [
     user_id,
     assessmentid,
@@ -2126,6 +2183,9 @@ app.post("/startup-api/governanceaudit", async (req, res) => {
     auditremark,
     auditstatus,
     auditscore,
+    auditplanid,
+    auditdate,
+    auditreportexpirydate,
   ];
 
   pool.query(sqlInsert, values, (error, result) => {
@@ -2149,10 +2209,11 @@ app.put("/startup-api/governanceaudit/:governanceauditid", async (req, res) => {
     auditremark,
     auditstatus,
     auditscore,
+    auditplanid,
   } = req.body;
 
-  const sqlUpdate =
-    "UPDATE public.governanceaudit SET user_id = $1, assessmentid = $2, auditreferencelink = $3, auditupload = $4, auditremark = $5, auditstatus = $6, auditscore = $7 WHERE governanceauditid = $8 RETURNING *";
+  const sqlUpdate = `UPDATE public.governanceaudit SET user_id = $1, assessmentid = $2, auditreferencelink = $3, auditupload = $4, auditremark = $5, auditstatus = $6, auditscore = $7,auditplanid=$8
+    WHERE governanceauditid = $9 RETURNING *`;
   const values = [
     user_id,
     assessmentid,
@@ -2161,6 +2222,8 @@ app.put("/startup-api/governanceaudit/:governanceauditid", async (req, res) => {
     auditremark,
     auditstatus,
     auditscore,
+    auditplanid,
+
     governanceauditid,
   ];
 
@@ -2201,6 +2264,360 @@ app.delete(
     }
   }
 );
+/****************************************************AUDIT PLAN APIS****************************************************** */
+app.get("/startup-api/auditplan", (req, res) => {
+  const sqlGet = "SELECT * FROM public.auditplan";
+  pool.query(sqlGet, (error, result) => {
+    if (error) {
+      console.error("Error fetching audit plan records", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res.json(result.rows);
+    }
+  });
+});
+
+// INSERT AUDIT PLAN
+app.post("/startup-api/auditplan", (req, res) => {
+  const {
+    projectname,
+    auditor,
+    auditees,
+    auditscope,
+    user_id,
+    projectdetailsid,
+    assessmentid,
+    auditorcompany,
+    fromdate,
+    todate,
+  } = req.body;
+
+  // Check if auditees is a string; if so, split it into an array
+  let auditeesArray = Array.isArray(auditees) ? auditees : auditees.split(",");
+
+  // Trim whitespace around each auditee name
+  auditeesArray = auditeesArray.map((auditee) => auditee.trim());
+
+  // Convert auditees to a PostgreSQL-compatible array format
+  const formattedAuditees = `{${auditeesArray.join(",")}}`;
+
+  const sqlInsert = `
+    INSERT INTO public.auditplan(
+       projectname, auditor, auditees, auditscope, user_id, projectdetailsid, assessmentid,auditorcompany,
+    fromdate,
+    todate
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8,$9,$10) RETURNING *;
+  `;
+
+  const values = [
+    projectname,
+    auditor,
+    formattedAuditees,
+    auditscope,
+
+    user_id,
+    projectdetailsid,
+    assessmentid,
+    auditorcompany,
+    fromdate,
+    todate,
+  ];
+
+  pool.query(sqlInsert, values, (error, result) => {
+    if (error) {
+      console.error("Error inserting audit plan record", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res.status(200).json({
+        message: "Audit plan record inserted successfully",
+        data: result.rows[0],
+      });
+    }
+  });
+});
+
+// GET AUDIT PLANS BY userID
+app.get("/startup-api/userauditplan/:user_id", (req, res) => {
+  const { user_id } = req.params;
+  const sqlGet = `SELECT * FROM public.auditplan where user_id=$1`;
+  pool.query(sqlGet, [user_id], (error, result) => {
+    if (error) {
+      console.error("Error fetching audit plan records", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res.json(result.rows);
+    }
+  });
+});
+
+// GET AUDIT PLAN BY ID
+app.get("/startup-api/auditplan/:auditplanid", (req, res) => {
+  const { auditplanid } = req.params;
+  const sqlGet = "SELECT * FROM public.auditplan WHERE auditplanid = $1";
+
+  pool.query(sqlGet, [auditplanid], (error, result) => {
+    if (error) {
+      console.error("Error fetching audit plan record", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res.json(result.rows);
+    }
+  });
+});
+
+//GET PLAN BY USER AND ASSESSMENT
+app.get("/startup-api/auditplan/:user_id/:assessmentid", (req, res) => {
+  const { user_id, assessmentid } = req.params;
+  const sqlGet =
+    "SELECT * FROM public.auditplan WHERE user_id = $1 AND assessmentid = $2";
+
+  pool.query(sqlGet, [user_id, assessmentid], (error, result) => {
+    if (error) {
+      console.error("Error fetching audit plan record", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res.json(result.rows);
+    }
+  });
+});
+
+// UPDATE AUDIT PLAN
+app.put("/startup-api/auditplan/:auditplanid", (req, res) => {
+  const { auditplanid } = req.params;
+  const {
+    projectname,
+    auditor,
+    auditees,
+    auditscope,
+
+    user_id,
+    projectdetailsid,
+    assessmentid,
+    auditorcompany,
+    fromdate,
+    todate,
+  } = req.body;
+
+  // Check if auditees is a string; if so, split it into an array
+  let auditeesArray = Array.isArray(auditees) ? auditees : auditees.split(",");
+
+  // Trim whitespace around each auditee name
+  auditeesArray = auditeesArray.map((auditee) => auditee.trim());
+
+  // Convert auditees to a PostgreSQL-compatible array format
+  const formattedAuditees = `{${auditeesArray.join(",")}}`;
+
+  const sqlUpdate = `
+    UPDATE public.auditplan 
+    SET projectname = $1, auditor = $2, auditees = $3, auditscope = $4,  user_id = $5, projectdetailsid = $6, assessmentid = $7,  auditorcompany=$8,
+    fromdate=$9,
+    todate=$10
+    WHERE auditplanid = $11 RETURNING *;
+  `;
+
+  const values = [
+    projectname,
+    auditor,
+    formattedAuditees,
+    auditscope,
+    user_id,
+    projectdetailsid,
+    assessmentid,
+    auditorcompany,
+    fromdate,
+    todate,
+    auditplanid,
+  ];
+
+  pool.query(sqlUpdate, values, (error, result) => {
+    if (error) {
+      console.error("Error updating audit plan record", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else if (result.rowCount === 0) {
+      res.status(404).json({ error: "Audit plan not found" });
+    } else {
+      res.status(200).json({
+        message: "Audit plan record updated successfully",
+        data: result.rows[0],
+      });
+    }
+  });
+});
+
+// DELETE AUDIT PLAN
+app.delete("/startup-api/auditplan/:auditplanid", (req, res) => {
+  const { auditplanid } = req.params;
+  const sqlDelete = "DELETE FROM public.auditplan WHERE auditplanid = $1";
+
+  pool.query(sqlDelete, [auditplanid], (error, result) => {
+    if (error) {
+      console.error("Error deleting audit plan record", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else if (result.rowCount === 0) {
+      res.status(404).json({ error: "Audit plan not found" });
+    } else {
+      res
+        .status(200)
+        .json({ message: "Audit plan record deleted successfully" });
+    }
+  });
+});
+/*****************************************************SCORE CARD**************************************************************** */
+app.get("/startup-api/scorecard/:user_id", (req, res) => {
+  const { user_id } = req.params;
+  const {
+    governancegroup,
+    organization,
+    projectname,
+    responsibilitygroup,
+    responsibilitycenter,
+    objecttype,
+    object,
+    auditorcompany,
+    fromdate, // Add fromdate to query parameters
+    todate, // Add todate to query parameters
+  } = req.query;
+
+  // Array to store conditions and values
+  const values = [user_id]; // user_id is always the first value
+  const conditions = ["user_id = $" + values.length];
+
+  // Add conditions for each provided parameter dynamically
+  if (governancegroup) {
+    conditions.push("governancegroup = $" + (values.length + 1));
+    values.push(governancegroup);
+  }
+  if (organization) {
+    conditions.push("organization = $" + (values.length + 1));
+    values.push(organization);
+  }
+  if (projectname) {
+    conditions.push("projectname = $" + (values.length + 1));
+    values.push(projectname);
+  }
+  if (responsibilitygroup) {
+    conditions.push("responsibilitygroup = $" + (values.length + 1));
+    values.push(responsibilitygroup);
+  }
+  if (responsibilitycenter) {
+    conditions.push("responsibilitycenter = $" + (values.length + 1));
+    values.push(responsibilitycenter);
+  }
+  if (objecttype) {
+    conditions.push("objecttype = $" + (values.length + 1));
+    values.push(objecttype);
+  }
+  if (object) {
+    conditions.push("object = $" + (values.length + 1));
+    values.push(object);
+  }
+  if (auditorcompany) {
+    conditions.push("auditorcompany = $" + (values.length + 1));
+    values.push(auditorcompany);
+  }
+
+  // Add date range condition if both fromdate and todate are provided
+  if (fromdate && todate) {
+    conditions.push(
+      `auditdate BETWEEN $${values.length + 1} AND $${values.length + 2}`
+    );
+    values.push(fromdate, todate);
+  }
+
+  // Construct the SQL query
+  let sqlQuery =
+    "SELECT * FROM ai_combined_data WHERE " + conditions.join(" AND ");
+
+  // Execute the SQL query with the provided parameters
+  pool.query(sqlQuery, values, (err, results) => {
+    if (err) {
+      console.error("Error executing SQL query:", err);
+      res.status(500).send("Internal Server Error");
+      return;
+    }
+
+    // Send the results as JSON
+    res.json(results.rows);
+  });
+});
+/***************************************************EMAIL API*************************************************************** */
+// Create transporter for sending emails
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL, // Your email address
+    pass: process.env.EMAIL_PASSWORD, // Your email password
+  },
+});
+
+// Generate password reset link
+function generateResetLink(email, user_id) {
+  const secret = process.env.JWT_SECRET; // Secret key for token
+  const payload = { email, user_id };
+  const token = jwt.sign(payload, secret, { expiresIn: "1h" }); // Token expires in 1 hour
+  return `${process.env.CLIENT_URL}/reset-password/${token}`; // Your front-end reset password page
+}
+
+// Password Reset Request API
+app.post("/startup-api/reset-password", async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    // Check if the user exists in the database
+    const result = await pool.query(
+      "SELECT * FROM startupuser WHERE user_email = $1",
+      [email]
+    );
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Generate reset link
+    const resetLink = generateResetLink(email, user.user_id);
+
+    // Send email with reset link
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: "Password Reset",
+      html: `<p>Hi ${user.user_name || "User"},</p>
+             <p>You requested a password reset. Click the link below to reset your password:</p>
+             <a href="${resetLink}">Reset Password</a>
+             <p>This link will expire in 1 hour.</p>`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        return res.status(500).json({ message: "Failed to send email", error });
+      }
+      res
+        .status(200)
+        .json({ message: "Password reset link sent successfully" });
+    });
+  } catch (error) {
+    console.error("Error handling password reset request:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Token Validation API
+app.post("/startup-api/validate-reset-token", (req, res) => {
+  const { token } = req.body;
+  const secret = process.env.JWT_SECRET;
+
+  try {
+    // Verify the token
+    const decoded = jwt.verify(token, secret);
+
+    // Token is valid, respond with success
+    res.status(200).json({ valid: true, decoded });
+  } catch (error) {
+    // Token is invalid or expired
+    res.status(400).json({ valid: false, message: "Invalid or expired token" });
+  }
+});
 
 /************************************************************************************************************************* */
 // Start server

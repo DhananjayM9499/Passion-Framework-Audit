@@ -7,13 +7,15 @@ import Navbar from "../../components/Navbar/Navbar";
 import "./Organization.css";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+
 import Pagination from "../../components/Pagination/Pagination";
+import NoDataAvailable from "../../components/NoDataAvailable/NoDataAvailable";
 const Organization = () => {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
 
-  const userId = localStorage.getItem("user_id");
+  const userId = sessionStorage.getItem("user_id");
 
   useEffect(() => {
     loadData();
@@ -71,6 +73,11 @@ const Organization = () => {
               </button>
             </div>
           </Link>
+          <Link to="/auditscore">
+            <div className="input-group center">
+              <button className="btn btn-round btn-signup">Audit Score</button>
+            </div>
+          </Link>
         </div>
         <div
           className="table-responsive mb-4 d-flex justify-content-end"
@@ -88,48 +95,54 @@ const Organization = () => {
               </tr>
             </thead>
             <tbody>
-              {currentItems.map((item, index) => (
-                <tr key={item.organizationid}>
-                  <td>{index + indexOfFirstItem + 1}</td>
-                  <td>{item.organization}</td>
-                  <td>{item.contactname}</td>
-                  <td>{item.contactemail}</td>
-                  <td>{item.contactphone}</td>
-                  <td>
-                    <Link to={`/organization/${item.organizationid}`}>
-                      <FaEdit size={24} />
-                    </Link>
+              {data.length === 0 ? (
+                <NoDataAvailable />
+              ) : (
+                currentItems.map((item, index) => (
+                  <tr key={item.organizationid}>
+                    <td>{index + indexOfFirstItem + 1}</td>
+                    <td>{item.organization}</td>
+                    <td>{item.contactname}</td>
+                    <td>{item.contactemail}</td>
+                    <td>{item.contactphone}</td>
+                    <td>
+                      <Link to={`/organization/${item.organizationid}`}>
+                        <FaEdit size={24} />
+                      </Link>
 
-                    <MdDelete
-                      size={24}
-                      onClick={() => deleteOrganization(item.organizationid)}
-                    />
-                    <Link
-                      to="/projectdetails"
-                      state={{
-                        organizationName: item.organization,
-                        organizationId: item.organizationid,
-                      }}
-                    >
-                      <div>
-                        <button className="btn btn-round btn-signup">
-                          Project
-                        </button>
-                      </div>
-                    </Link>
-                  </td>
-                </tr>
-              ))}
+                      <MdDelete
+                        size={24}
+                        onClick={() => deleteOrganization(item.organizationid)}
+                      />
+                      <Link
+                        to="/projectdetails"
+                        state={{
+                          organizationName: item.organization,
+                          organizationId: item.organizationid,
+                        }}
+                      >
+                        <div>
+                          <button className="btn btn-round btn-signup">
+                            Project
+                          </button>
+                        </div>
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
-        <div className="d-flex justify-content-center">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            paginate={setCurrentPage}
-          />
-        </div>
+        {data.length > 0 && (
+          <div className="d-flex justify-content-center">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              paginate={setCurrentPage}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

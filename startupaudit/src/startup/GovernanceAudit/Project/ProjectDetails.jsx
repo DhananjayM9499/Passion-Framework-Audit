@@ -7,15 +7,16 @@ import Navbar from "../../components/Navbar/Navbar";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import Pagination from "../../components/Pagination/Pagination";
+import NoDataAvailable from "../../components/NoDataAvailable/NoDataAvailable";
 
 const ProjectDetails = () => {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
 
-  const userId = localStorage.getItem("user_id");
+  const userId = sessionStorage.getItem("user_id");
   const location = useLocation();
-  const { organizationName } = location.state || {};
+  const { organizationName, organizationId } = location.state || {};
 
   useEffect(() => {
     loadData();
@@ -63,7 +64,10 @@ const ProjectDetails = () => {
       <div className="mt-4">
         <h1 className="text-center mb-4 mt-4">Proect Details</h1>
         <div className="mb-4 d-flex justify-content-end">
-          <Link to="/projectdetails/add" state={{ organizationName }}>
+          <Link
+            to="/projectdetails/add"
+            state={{ organizationName, organizationId }}
+          >
             <div className="input-group center">
               <button className="btn btn-round btn-signup">Add Project</button>
             </div>
@@ -85,35 +89,39 @@ const ProjectDetails = () => {
               </tr>
             </thead>
             <tbody>
-              {currentItems.map((item, index) => (
-                <tr key={item.projectid}>
-                  <td>{index + indexOfFirstItem + 1}</td>
-                  <td>{item.organization}</td>
-                  <td>{item.projectname}</td>
-                  <td>{item.projectcode}</td>
-                  <td>{new Date(item.auditdate).toLocaleDateString()}</td>
-                  <td>
-                    <Link to={`/projectdetails/${item.projectdetailsid}`}>
-                      <FaEdit size={24} />
-                    </Link>
-                    <MdDelete
-                      size={24}
-                      onClick={() => deleteProject(item.projectdetailsid)}
-                      style={{ cursor: "pointer", marginLeft: "10px" }}
-                    />
-                    <Link
-                      to="/evidence"
-                      state={{ projectId: item.projectdetailsid }}
-                    >
-                      <div>
-                        <button className="btn btn-round btn-signup ml-2">
-                          Evidence
-                        </button>
-                      </div>
-                    </Link>
-                  </td>
-                </tr>
-              ))}
+              {data.length === 0 ? (
+                <NoDataAvailable />
+              ) : (
+                currentItems.map((item, index) => (
+                  <tr key={item.projectid}>
+                    <td>{index + indexOfFirstItem + 1}</td>
+                    <td>{item.organization}</td>
+                    <td>{item.projectname}</td>
+                    <td>{item.projectcode}</td>
+                    <td>{new Date(item.auditdate).toLocaleDateString()}</td>
+                    <td>
+                      <Link to={`/projectdetails/${item.projectdetailsid}`}>
+                        <FaEdit size={24} />
+                      </Link>
+                      <MdDelete
+                        size={24}
+                        onClick={() => deleteProject(item.projectdetailsid)}
+                        style={{ cursor: "pointer", marginLeft: "10px" }}
+                      />
+                      <Link
+                        to="/evidence"
+                        state={{ projectId: item.projectdetailsid }}
+                      >
+                        <div>
+                          <button className="btn btn-round btn-signup ml-2">
+                            Evidence
+                          </button>
+                        </div>
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

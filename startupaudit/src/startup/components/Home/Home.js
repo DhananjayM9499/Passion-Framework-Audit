@@ -5,11 +5,11 @@ import { jwtDecode } from "jwt-decode";
 
 function Home() {
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
-        localStorage.setItem("user_id", decodedToken.userId);
+        sessionStorage.setItem("user_id", decodedToken.userId);
       } catch (error) {
         console.error("Invalid token:", error);
       }

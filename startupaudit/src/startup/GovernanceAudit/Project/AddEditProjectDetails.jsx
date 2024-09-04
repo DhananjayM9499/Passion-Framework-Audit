@@ -50,9 +50,9 @@ const AddEditProjectDetails = () => {
 
   const navigate = useNavigate();
   const { projectdetailsid } = useParams();
-  const userId = localStorage.getItem("user_id");
+  const userId = sessionStorage.getItem("user_id");
   const location = useLocation();
-  const { organizationName } = location.state || {};
+  const { organizationName, organizationId } = location.state || {};
 
   useEffect(() => {
     if (projectdetailsid) {
@@ -202,6 +202,7 @@ const AddEditProjectDetails = () => {
         project_category,
         responsibilitycenter,
         responsibilitygroup,
+        organizationid: organizationId,
       };
 
       if (!projectdetailsid) {

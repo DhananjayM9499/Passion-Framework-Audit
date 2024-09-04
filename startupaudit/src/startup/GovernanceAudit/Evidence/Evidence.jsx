@@ -10,9 +10,10 @@ import Pagination from "../../components/Pagination/Pagination";
 import { toast } from "react-toastify";
 import { useProjectDetails } from "../../components/Hooks/useProjectDetails";
 import { useOrganizationDetails } from "../../components/Hooks/useOrganizationDetails";
+import NoDataAvailable from "../../components/NoDataAvailable/NoDataAvailable";
 
 const Evidence = () => {
-  const userId = localStorage.getItem("user_id");
+  const userId = sessionStorage.getItem("user_id");
   const location = useLocation();
   const { projectId } = location.state || {};
   // const [data, setData] = useState([]);
@@ -244,16 +245,20 @@ const Evidence = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentItems.length > 0 && (
-                    <tr key={currentItems[0].evidenceid}>
-                      <td>{indexOfFirstItem + 1}</td>{" "}
-                      {/* Since you're only showing the first item, index is 0 */}
-                      <td>{currentItems[0].governancegroup}</td>
-                      <td>{currentItems[0].thrustarea}</td>
-                      <td>{currentItems[0].controlname}</td>
-                      <td>{currentItems[0].subcontrolname}</td>
-                      <td>{currentItems[0].expectedevidence}</td>
-                    </tr>
+                  {state.length === 0 ? (
+                    <NoDataAvailable />
+                  ) : (
+                    currentItems.length > 0 && (
+                      <tr key={currentItems[0].evidenceid}>
+                        <td>{indexOfFirstItem + 1}</td>{" "}
+                        {/* Since you're only showing the first item, index is 0 */}
+                        <td>{currentItems[0].governancegroup}</td>
+                        <td>{currentItems[0].thrustarea}</td>
+                        <td>{currentItems[0].controlname}</td>
+                        <td>{currentItems[0].subcontrolname}</td>
+                        <td>{currentItems[0].expectedevidence}</td>
+                      </tr>
+                    )
                   )}
                 </tbody>
               </table>
@@ -294,48 +299,52 @@ const Evidence = () => {
                 </tr>
               </thead>
               <tbody>
-                {currentItems.map((item, index) => (
-                  <tr key={item.evidenceid}>
-                    <td>{index + indexOfFirstItem + 1}</td>
-                    <td>
-                      <a
-                        style={{ color: "blue" }}
-                        href={item.evidencereferencelink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {item.evidencereferencelink}
-                      </a>
-                    </td>
-                    <td>{item.evidenceremark}</td>
-                    <td>{item.evidencestatus}</td>
-                    <td>{item.uploadevidence}</td>
-                    <td>
-                      <Link
-                        to={`/evidence/${item.evidenceid}`}
-                        state={{ projectId }}
-                      >
-                        <FaEdit size={24} />
-                      </Link>
+                {state.length === 0 ? (
+                  <NoDataAvailable />
+                ) : (
+                  currentItems.map((item, index) => (
+                    <tr key={item.evidenceid}>
+                      <td>{index + indexOfFirstItem + 1}</td>
+                      <td>
+                        <a
+                          style={{ color: "blue" }}
+                          href={item.evidencereferencelink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {item.evidencereferencelink}
+                        </a>
+                      </td>
+                      <td>{item.evidenceremark}</td>
+                      <td>{item.evidencestatus}</td>
+                      <td>{item.uploadevidence}</td>
+                      <td>
+                        <Link
+                          to={`/evidence/${item.evidenceid}`}
+                          state={{ projectId }}
+                        >
+                          <FaEdit size={24} />
+                        </Link>
 
-                      <MdDelete
-                        size={24}
-                        onClick={() => deleteEvidence(item.evidenceid)}
-                        style={{ cursor: "pointer", marginLeft: "10px" }}
-                      />
-                      <Link
-                        to="/assessment"
-                        state={{ projectId, evidenceId: item.evidenceid }}
-                      >
-                        <div>
-                          <button className="btn btn-round btn-signup ml-2">
-                            Assessment
-                          </button>
-                        </div>
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
+                        <MdDelete
+                          size={24}
+                          onClick={() => deleteEvidence(item.evidenceid)}
+                          style={{ cursor: "pointer", marginLeft: "10px" }}
+                        />
+                        <Link
+                          to="/assessment"
+                          state={{ projectId, evidenceId: item.evidenceid }}
+                        >
+                          <div>
+                            <button className="btn btn-round btn-signup ml-2">
+                              Assessment
+                            </button>
+                          </div>
+                        </Link>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

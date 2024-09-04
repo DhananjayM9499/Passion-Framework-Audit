@@ -28,8 +28,8 @@ function Login() {
         if (response.ok) {
           // Save token in local storage or context
 
-          localStorage.setItem("token", data.token || "");
-
+          // sessionStorage.setItem("token", data.token || "");
+          sessionStorage.setItem("token", data.token || "");
           toast.success("Login successful!");
           navigate("/home");
         } else {
@@ -75,7 +75,18 @@ function Login() {
                       placeholder="Password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      style={{ marginBottom: "0" }}
                     />
+                    <div className="row">
+                      <p className="forget-p" style={{ textAlign: "end" }}>
+                        <Link
+                          style={{ color: "#ff3131", textAlign: "right" }}
+                          to="/forgotpassword"
+                        >
+                          Forgot Password?
+                        </Link>
+                      </p>
+                    </div>
 
                     <div className="input-group center">
                       <button

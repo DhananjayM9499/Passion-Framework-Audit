@@ -18,7 +18,7 @@ const AddEditOrganization = () => {
   const { organization, contactname, contactemail, contactphone } = state;
   const navigate = useNavigate();
   const { organizationid } = useParams();
-  const userId = localStorage.getItem("user_id");
+  const userId = sessionStorage.getItem("user_id");
 
   useEffect(() => {
     if (organizationid) {

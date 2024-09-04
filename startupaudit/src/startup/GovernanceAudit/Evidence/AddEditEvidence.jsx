@@ -21,7 +21,7 @@ const initialState = {
 };
 
 const AddEditEvidence = () => {
-  const userId = localStorage.getItem("user_id");
+  const userId = sessionStorage.getItem("user_id");
   const location = useLocation();
   const { projectId } = location.state || {};
   const { evidenceid } = useParams();
@@ -200,13 +200,15 @@ const AddEditEvidence = () => {
       evidencereferencelink,
       evidenceremark,
       evidencestatus,
+      uploadevidence,
     } = state;
 
     if (
       !expectedevidence ||
       !evidencereferencelink ||
       !evidenceremark ||
-      !evidencestatus
+      !evidencestatus ||
+      !uploadevidence
     ) {
       toast.error("Please provide all the required fields");
       return;
@@ -529,14 +531,23 @@ const AddEditEvidence = () => {
               >
                 Evidence Status
               </label>
-              <input
+              <select
                 type="text"
                 id="evidencestatus"
                 name="evidencestatus"
                 value={state.evidencestatus}
                 onChange={handleInputChange}
                 className="add-edit-project-input"
-              />
+              >
+                <option value="">Select Status</option>
+                <option value="Fully Compliant">Fully Compliant</option>{" "}
+                <option value="Major Non-Compliant">Major Non-Compliant</option>{" "}
+                <option value="Minor Non-Compliant">Minor Non-Compliant</option>
+                <option value="Observation">Observation</option>
+                <option value="Suggestions">Suggestions</option>
+                <option value="Not Applicable">Not Applicable</option>
+                <option value="On Hold">On Hold</option>
+              </select>
             </div>
 
             <div>
