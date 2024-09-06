@@ -175,10 +175,61 @@ app.post("/startup-api/password", async (req, res) => {
 /******************************************LOGIN API************************************************* */
 const secretKey = process.env.JWT_SECRET; // Replace with your actual secret key
 // Login Endpoint
+// app.post("/startup-api/login", async (req, res) => {
+//   const { email, password } = req.body;
+
+//   try {
+//     // Find user by email
+//     const result = await pool.query(
+//       "SELECT * FROM startupuser WHERE user_email = $1",
+//       [email]
+//     );
+
+//     if (result.rows.length === 0) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     // Compare passwords
+//     const match = await bcrypt.compare(password, result.rows[0].user_password);
+//     if (!match) {
+//       return res.status(401).json({ message: "Invalid credentials" });
+//     }
+
+//     if (result.rows[0].is_verified !== true) {
+//       return res.status(401).json({ message: " Unverified Account" });
+//     }
+//     const userName = result.rows[0].user_name;
+//     // Generate JWT token
+//     const token = jwt.sign(
+//       {
+//         userId: result.rows[0].user_id,
+//         email: result.rows[0].user_email,
+//         userName: result.rows[0].user_name,
+//       },
+//       secretKey,
+//       {
+//         expiresIn: "1h", // Token expires in 1 hour
+//         issuer: process.env.CLIENT_URL, // The issuer of the token
+//         audience: userName, // The intended audience
+//       }
+//     );
+
+//     res.status(200).json({ token });
+//   } catch (err) {
+//     console.error("Error logging in:", err);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// });
 app.post("/startup-api/login", async (req, res) => {
-  const { email, password } = req.body;
+  const { encryptedData } = req.body;
 
   try {
+    // Decrypt data
+    const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
+    const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
+    const { email, password } = decryptedData;
+    console.log(email, password);
     // Find user by email
     const result = await pool.query(
       "SELECT * FROM startupuser WHERE user_email = $1",
@@ -196,8 +247,9 @@ app.post("/startup-api/login", async (req, res) => {
     }
 
     if (result.rows[0].is_verified !== true) {
-      return res.status(401).json({ message: " Unverified Account" });
+      return res.status(401).json({ message: "Unverified Account" });
     }
+
     const userName = result.rows[0].user_name;
     // Generate JWT token
     const token = jwt.sign(

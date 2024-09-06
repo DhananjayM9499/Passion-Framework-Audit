@@ -1,5 +1,5 @@
-//const BASE_URL = "http://localhost:5009/startup-api/";
-const BASE_URL = "https://audit1.passionit.com/startup-api/startup-api/";
+const BASE_URL = "http://localhost:5009/startup-api/";
+//const BASE_URL = "https://audit1.passionit.com/startup-api/startup-api/";
 
 export const LOGIN = `${BASE_URL}login`;
 export const SIGNUP = `${BASE_URL}signup`;
