@@ -1,5 +1,5 @@
-const BASE_URL = "http://localhost:5009/startup-api/";
-//const BASE_URL = "https://audit1.passionit.com/startup-api/startup-api/";
+//const BASE_URL = "http://localhost:5009/startup-api/";
+const BASE_URL = "https://audit1.passionit.com/startup-api/startup-api/";
 
 export const LOGIN = `${BASE_URL}login`;
 export const SIGNUP = `${BASE_URL}signup`;
@@ -238,3 +238,4 @@ export const GET_SCORECARD_API = (user_id) => `${BASE_URL}scorecard/${user_id}`;
 export const RESET_PASSWORD_API = `${BASE_URL}reset-password`;
 export const VALIDATE_TOKEN_API = `${BASE_URL}validate-reset-token`;
 export const UPDATE_PASSWORD_API = `${BASE_URL}password`;
+export const VERIFY_OTP_API = `${BASE_URL}verify-otp`;

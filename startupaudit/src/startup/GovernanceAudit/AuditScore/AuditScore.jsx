@@ -95,7 +95,7 @@ const AuditScore = () => {
           projectname: state.projectname || "",
           object: state.object || "",
           objecttype: state.objecttype || "",
-          groupname: state.groupname || "",
+          governancegroup: state.groupname || "",
           auditorcompany: state.auditorcompany || "",
           fromdate: state.fromDate
             ? new Date(state.fromDate).toISOString().split("T")[0]

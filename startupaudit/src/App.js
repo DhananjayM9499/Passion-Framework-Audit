@@ -63,6 +63,7 @@ import AddEditAuditPlan from "./startup/GovernanceAudit/AuditPlan/AddEditAuditPl
 import AuditScore from "./startup/GovernanceAudit/AuditScore/AuditScore";
 import ForgotPassword from "./startup/components/ForgotPassword/ForgotPassword";
 import ResetPassword from "./startup/components/ForgotPassword/ResetPassword";
+import VerifyOTP from "./startup/components/Login/VerifyOTP";
 
 function App() {
   return (
@@ -85,6 +86,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/forgotpassword" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
+            <Route path="/verifyotp" element={<VerifyOTP />} />
 
             {/**********************************************Organization URLS********************************************* */}
             <Route

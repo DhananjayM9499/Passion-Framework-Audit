@@ -33,7 +33,7 @@ function Signup() {
         const data = await response.json();
         if (response.ok) {
           toast.success("Signup successful! Please log in.");
-          navigate("/login");
+          navigate("/verifyotp");
         } else {
           toast.error("Signup failed: " + data.message);
         }

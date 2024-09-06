@@ -15,7 +15,7 @@ import { MdManageAccounts } from "react-icons/md";
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation(); // Access current route
-  const [email, setEmail] = useState("");
+  const [userName, SetUserName] = useState("");
   const [sidebar, setSidebar] = useState(false);
   const [subNav, setSubNav] = useState({});
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -26,7 +26,7 @@ function Navbar() {
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
-        setEmail(decodedToken.email);
+        SetUserName(decodedToken.userName);
       } catch (error) {
         console.error("Invalid token:", error);
       }
@@ -171,7 +171,7 @@ function Navbar() {
                 <VscAccount />
               </IconContext.Provider>{" "}
               &nbsp;
-              <span className="email-text ml-4">{email}</span>
+              <span className="email-text ml-4">{userName}</span>
               {isDropdownOpen && (
                 <div className="dropdown-menu show mt-2">
                   {" "}
