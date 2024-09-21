@@ -1,0 +1,48 @@
+/* Assuming this is your CSS code */
+td {
+  width: 481pt;
+  border-top-style: solid;
+  border-top-width: 2pt;
+  border-left-style: solid;
+  border-left-width: 3pt;
+  border-bottom-style: solid;
+  border-bottom-width: 3pt;
+  border-bottom-color: #bf0000;
+  border-right-style: solid;
+  border-right-width: 3pt;
+}
+td {
+  width: 99pt;
+  border-top-style: solid;
+  border-top-width: 3pt;
+  border-top-color: #bf0000;
+  border-left-style: solid;
+  border-left-width: 3pt;
+  border-bottom-style: solid;
+  border-bottom-width: 1pt;
+  border-right-style: solid;
+  border-right-width: 1pt;
+}
+td {
+  width: 139pt;
+  border-top-style: solid;
+  border-top-width: 3pt;
+  border-top-color: #bf0000;
+  border-left-style: solid;
+  border-left-width: 1pt;
+  border-bottom-style: solid;
+  border-bottom-width: 1pt;
+  border-right-style: solid;
+  border-right-width: 3pt;
+}
+td {
+  width: 243pt;
+  border-top-style: solid;
+  border-top-width: 3pt;
+  border-left-style: solid;
+  border-left-width: 3pt;
+  border-bottom-style: solid;
+  border-bottom-width: 3pt;
+  border-right-style: solid;
+  border-right-width: 3pt;
+}

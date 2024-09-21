@@ -113,7 +113,6 @@ const AuditScore = () => {
         setScorecardData(scorecardData);
         setUser(scorecardData);
         setSelectedGraphData(scorecardData);
-        console.log(scorecardData);
 
         // Calculate total score with a check for undefined scorecardData
         const totalScore = scorecardData.reduce(
@@ -131,7 +130,7 @@ const AuditScore = () => {
           result[groupname] += item ? calculateFinalScore(item) : 0;
           return result;
         }, {});
-        console.log(groupedData);
+
         setPieChartData(mapDataToPieChart(groupedData));
 
         // Parallelize the other API requests with default empty arrays for fallback
@@ -223,6 +222,8 @@ const AuditScore = () => {
       "Auditees",
       "From Date",
       "To Date",
+      "Audit Scope",
+      "Certificate Scope",
       "Auditor Company",
       "Audit Reference Link",
       "Audit Upload",
@@ -230,6 +231,10 @@ const AuditScore = () => {
       "Audit Status",
       "Audit Score",
       "Audit Date",
+      "Report Expiry Date",
+      "Next Audit Date",
+      "Next Recomended Days",
+      "Audit Validity Days",
     ];
     csvRows.push(headers.join(","));
 
@@ -277,6 +282,8 @@ const AuditScore = () => {
         wrapInQuotes((item.auditees || []).join(";") || "N/A"),
         wrapInQuotes(item.fromdate || "N/A"),
         wrapInQuotes(item.todate || "N/A"),
+        wrapInQuotes(item.auditscope || "N/A"),
+        wrapInQuotes(item.certificatescope || "N/A"),
         wrapInQuotes(item.auditorcompany || "N/A"),
         wrapInQuotes(item.auditreferencelink || "N/A"),
         wrapInQuotes(item.auditupload || "N/A"),
@@ -284,6 +291,10 @@ const AuditScore = () => {
         wrapInQuotes(item.auditstatus || "N/A"),
         wrapInQuotes(item.auditscore || "N/A"),
         wrapInQuotes(item.auditdate || "N/A"),
+        wrapInQuotes(item.auditreportexpirydate || "N/A"),
+        wrapInQuotes(item.nextauditdate || "N/A"),
+        wrapInQuotes(item.recomendeddays || "N/A"),
+        wrapInQuotes(item.validityperiod || "N/A"),
       ];
       csvRows.push(row.join(","));
     });

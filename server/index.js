@@ -9,22 +9,39 @@ require("dotenv").config();
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const CryptoJS = require("crypto-js");
+const multer = require("multer");
+const path = require("path");
+
 // PostgreSQL Connection
 const port = process.env.PORT; // Choose your desired port
+let pool;
+const connectWithRetry = () => {
+  pool = new Pool({
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
+  });
+  pool
+    .connect()
+    .then(() => console.log("Connected to PostgreSQL"))
+    .catch((err) => {
+      console.error("Failed to connect, retrying in 5 seconds...", err);
+      setTimeout(connectWithRetry, 5000); // Retry connection after 5 seconds
+    });
 
-const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
-});
+  pool.on("error", (err) => {
+    console.error("Unexpected error on idle client", err);
+    pool.end();
+    connectWithRetry(); // Reconnect on error
+  });
+};
+
+connectWithRetry();
+
 const jwt = require("jsonwebtoken");
 // Connect to PostgreSQL
-pool
-  .connect()
-  .then(() => console.log("PostgreSQL Connected"))
-  .catch((err) => console.error("PostgreSQL Connection Error", err.stack));
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -229,7 +246,7 @@ app.post("/startup-api/login", async (req, res) => {
     const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 
     const { email, password } = decryptedData;
-    console.log(email, password);
+
     // Find user by email
     const result = await pool.query(
       "SELECT * FROM startupuser WHERE user_email = $1",
@@ -2314,10 +2331,16 @@ app.post("/startup-api/governanceaudit", async (req, res) => {
     auditplanid,
     auditdate,
     auditreportexpirydate,
+    recomendeddays,
+    validityperiod,
+    nextauditdate,
+    auditrating,
+    assessmentrating,
   } = req.body;
 
   const sqlInsert = `INSERT INTO public.governanceaudit( user_id, assessmentid, auditreferencelink, auditupload, auditremark, auditstatus, auditscore,auditplanid,auditdate,
-    auditreportexpirydate) VALUES ($1, $2, $3, $4, $5, $6, $7,$8,$9,$10) RETURNING *`;
+    auditreportexpirydate ,recomendeddays,validityperiod,nextauditdate,auditrating,
+    assessmentrating) VALUES ($1, $2, $3, $4, $5, $6, $7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING *`;
   const values = [
     user_id,
     assessmentid,
@@ -2329,6 +2352,11 @@ app.post("/startup-api/governanceaudit", async (req, res) => {
     auditplanid,
     auditdate,
     auditreportexpirydate,
+    recomendeddays,
+    validityperiod,
+    nextauditdate,
+    auditrating,
+    assessmentrating,
   ];
 
   pool.query(sqlInsert, values, (error, result) => {
@@ -2353,10 +2381,13 @@ app.put("/startup-api/governanceaudit/:governanceauditid", async (req, res) => {
     auditstatus,
     auditscore,
     auditplanid,
+    auditrating,
+    assessmentrating,
   } = req.body;
 
   const sqlUpdate = `UPDATE public.governanceaudit SET user_id = $1, assessmentid = $2, auditreferencelink = $3, auditupload = $4, auditremark = $5, auditstatus = $6, auditscore = $7,auditplanid=$8
-    WHERE governanceauditid = $9 RETURNING *`;
+   auditrating=$9,
+    assessmentrating=$10, WHERE governanceauditid = $11 RETURNING *`;
   const values = [
     user_id,
     assessmentid,
@@ -2366,7 +2397,8 @@ app.put("/startup-api/governanceaudit/:governanceauditid", async (req, res) => {
     auditstatus,
     auditscore,
     auditplanid,
-
+    auditrating,
+    assessmentrating,
     governanceauditid,
   ];
 
@@ -2420,8 +2452,27 @@ app.get("/startup-api/auditplan", (req, res) => {
   });
 });
 
+/************************************************************** */
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "logo")); // Save files to the 'photos' folder
+  },
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
+
+const upload = multer({ storage: storage });
+
+/******************************************************************* */
+
+app.use("/startup-api/logo", express.static(path.join(__dirname, "logo")));
+/********************************************* */
 // INSERT AUDIT PLAN
-app.post("/startup-api/auditplan", (req, res) => {
+app.post("/startup-api/auditplan", upload.single("photo"), (req, res) => {
   const {
     projectname,
     auditor,
@@ -2433,6 +2484,7 @@ app.post("/startup-api/auditplan", (req, res) => {
     auditorcompany,
     fromdate,
     todate,
+    certificatescope,
   } = req.body;
 
   // Check if auditees is a string; if so, split it into an array
@@ -2444,12 +2496,14 @@ app.post("/startup-api/auditplan", (req, res) => {
   // Convert auditees to a PostgreSQL-compatible array format
   const formattedAuditees = `{${auditeesArray.join(",")}}`;
 
+  // Get the file name if a photo was uploaded
+  const auditorcompanylogo = req.file ? req.file.filename : null;
+
   const sqlInsert = `
     INSERT INTO public.auditplan(
-       projectname, auditor, auditees, auditscope, user_id, projectdetailsid, assessmentid,auditorcompany,
-    fromdate,
-    todate
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8,$9,$10) RETURNING *;
+       projectname, auditor, auditees, auditscope, user_id, projectdetailsid, assessmentid, auditorcompany,
+       fromdate, todate, certificatescope, auditorcompanylogo
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *;
   `;
 
   const values = [
@@ -2457,13 +2511,14 @@ app.post("/startup-api/auditplan", (req, res) => {
     auditor,
     formattedAuditees,
     auditscope,
-
     user_id,
     projectdetailsid,
     assessmentid,
     auditorcompany,
     fromdate,
     todate,
+    certificatescope,
+    auditorcompanylogo,
   ];
 
   pool.query(sqlInsert, values, (error, result) => {
@@ -2532,13 +2587,13 @@ app.put("/startup-api/auditplan/:auditplanid", (req, res) => {
     auditor,
     auditees,
     auditscope,
-
     user_id,
     projectdetailsid,
     assessmentid,
     auditorcompany,
     fromdate,
     todate,
+    certificatescope,
   } = req.body;
 
   // Check if auditees is a string; if so, split it into an array
@@ -2554,8 +2609,8 @@ app.put("/startup-api/auditplan/:auditplanid", (req, res) => {
     UPDATE public.auditplan 
     SET projectname = $1, auditor = $2, auditees = $3, auditscope = $4,  user_id = $5, projectdetailsid = $6, assessmentid = $7,  auditorcompany=$8,
     fromdate=$9,
-    todate=$10
-    WHERE auditplanid = $11 RETURNING *;
+    todate=$10,certificatescope=$11
+    WHERE auditplanid = $12 RETURNING *;
   `;
 
   const values = [
@@ -2570,6 +2625,7 @@ app.put("/startup-api/auditplan/:auditplanid", (req, res) => {
     fromdate,
     todate,
     auditplanid,
+    certificatescope,
   ];
 
   pool.query(sqlUpdate, values, (error, result) => {
@@ -2760,6 +2816,24 @@ app.post("/startup-api/validate-reset-token", (req, res) => {
     // Token is invalid or expired
     res.status(400).json({ valid: false, message: "Invalid or expired token" });
   }
+});
+
+//GENERATE CERTIFICATE
+app.get("/startup-api/certificateData/:governanceauditid", (req, res) => {
+  // Extracting IDs from query parameters
+  const { governanceauditid } = req.params;
+
+  // SQL query with multiple WHERE clauses for each ID
+  const sqlGet = ` SELECT * from ai_combined_data where governanceauditid=$1 `;
+  // Query execution with parameters
+  pool.query(sqlGet, [governanceauditid], (error, result) => {
+    if (error) {
+      console.error("Error fetching data from ai_combined_data", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res.json(result.rows);
+    }
+  });
 });
 
 /************************************************************************************************************************* */

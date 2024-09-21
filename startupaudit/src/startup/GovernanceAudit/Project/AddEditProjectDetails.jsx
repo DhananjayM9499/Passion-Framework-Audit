@@ -181,7 +181,7 @@ const AddEditProjectDetails = () => {
     e.preventDefault();
 
     if (!projectname || !projectcode || !auditdate || !audittime) {
-      toast.error("Please provide all the required fields");
+      toast.error("Please provide all the required fields ");
     } else {
       const payload = {
         organization,
@@ -376,6 +376,8 @@ const AddEditProjectDetails = () => {
               <label htmlFor="technology" className="add-edit-project-label">
                 Technology
               </label>
+
+              {/**************************************************** */}
               <select
                 id="technology"
                 name="technology"
@@ -390,6 +392,8 @@ const AddEditProjectDetails = () => {
                   </option>
                 ))}
               </select>
+
+              {/***************************************************** */}
             </div>
             <div>
               <label htmlFor="environment" className="add-edit-project-label">

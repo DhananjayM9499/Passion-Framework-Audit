@@ -78,6 +78,13 @@ const Organization = () => {
               <button className="btn btn-round btn-signup">Audit Score</button>
             </div>
           </Link>
+          <Link to="/auditratings">
+            <div className="input-group center">
+              <button className="btn btn-round btn-signup">
+                Audit Ratings
+              </button>
+            </div>
+          </Link>
         </div>
         <div
           className="table-responsive mb-4 d-flex justify-content-end"

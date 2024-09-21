@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import { useProjectDetails } from "../../components/Hooks/useProjectDetails";
 import { useOrganizationDetails } from "../../components/Hooks/useOrganizationDetails";
 import NoDataAvailable from "../../components/NoDataAvailable/NoDataAvailable";
+import CertificateGenerator from "../AuditCertificate/CertificateGenerator";
 
 const Audit = () => {
   const userId = sessionStorage.getItem("user_id");
@@ -23,11 +24,18 @@ const Audit = () => {
   const [audit, Setaudit] = useState([]);
   const itemsPerPage = 3;
   const [state, setState] = useState([]);
+  const [showDataPopup, setShowDataPopup] = useState(false);
+  const [selectedData, setSelectedData] = useState(null);
 
   const { data, error: projectError } = useProjectDetails(projectId);
   const { organization, error: organizationError } = useOrganizationDetails(
     data.organization
   );
+
+  const handleDataButtonClick = (item) => {
+    setSelectedData(item);
+    setShowDataPopup(true);
+  };
 
   useEffect(() => {
     const loadEvidence = async () => {
@@ -335,6 +343,8 @@ const Audit = () => {
                   <th scope="col">Audit Remark</th>
                   <th scope="col">Audit Status</th>
                   <th scope="col">Audit Score</th>
+                  <th scope="col">Audit Rating</th>
+                  <th scope="col">Assessment Rating</th>
                   <th scope="col">Audit Date</th>
                   <th scope="col">Audit Validity Date</th>
                   <th scope="col">Next Audit Date </th>
@@ -358,9 +368,24 @@ const Audit = () => {
                           {item.auditreferencelink}
                         </a>
                       </td>
-                      <td>{item.auditupload}</td>
+                      <td>
+                        <a
+                          style={{ color: "blue" }}
+                          href={item.auditupload}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Document
+                        </a>
+                      </td>
                       <td>{item.auditremark}</td>
                       <td>{item.auditstatus}</td>
+                      <td>
+                        <b>{item.auditrating}</b>
+                      </td>
+                      <td>
+                        <b>{item.assessmentrating}</b>
+                      </td>
                       <td>{item.auditscore}</td>
                       <td>{formatDate(item.auditdate)}</td>
                       <td>{formatDate(item.auditreportexpirydate)}</td>
@@ -383,13 +408,14 @@ const Audit = () => {
                           onClick={() => deleteAudit(item.governanceauditid)}
                           style={{ cursor: "pointer", marginLeft: "10px" }}
                         />
-                        <Link
-                          to="/audit"
+                        {/* <Link
+                          to="/certificate"
                           state={{
                             projectId,
                             evidenceId,
                             assessmentId,
                             auditPlanId,
+                            auditId: item.governanceauditid,
                           }}
                         >
                           <div>
@@ -397,7 +423,16 @@ const Audit = () => {
                               View Audit Details
                             </button>
                           </div>
-                        </Link>
+                        </Link> */}
+                        <button
+                          type="button"
+                          className="btn btn-round btn-signup"
+                          onClick={() =>
+                            handleDataButtonClick(item.governanceauditid)
+                          }
+                        >
+                          Audit Certificate
+                        </button>
                       </td>
                     </tr>
                   ))
@@ -416,6 +451,12 @@ const Audit = () => {
           )}
         </div>
       </div>
+      {showDataPopup && (
+        <CertificateGenerator
+          item={selectedData}
+          onClose={() => setShowDataPopup(false)}
+        />
+      )}
     </div>
   );
 };

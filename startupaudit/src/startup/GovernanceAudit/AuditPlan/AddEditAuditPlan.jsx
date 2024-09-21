@@ -29,6 +29,7 @@ const AddEditAuditPlan = () => {
   const [auditPlan, SetauditPlan] = useState(initialState);
   const itemsPerPage = 3;
   const [state, setState] = useState([]);
+  const [file, setFile] = useState(null);
   const { auditplanid } = useParams();
   const navigate = useNavigate();
   useEffect(() => {
@@ -170,11 +171,23 @@ const AddEditAuditPlan = () => {
     const { name, value } = e.target;
     SetauditPlan((prevState) => ({ ...prevState, [name]: value }));
   };
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { auditor, auditees, auditscope, auditorcompany, fromdate, todate } =
-      auditPlan;
+    const {
+      auditor,
+      auditees,
+      auditscope,
+      auditorcompany,
+      fromdate,
+      todate,
+      certificatescope,
+    } = auditPlan;
 
     if (
       !auditor ||
@@ -182,7 +195,8 @@ const AddEditAuditPlan = () => {
       !auditscope ||
       !auditorcompany ||
       !fromdate ||
-      !todate
+      !todate ||
+      !certificatescope
     ) {
       toast.error("Please provide all the required fields");
       return;
@@ -192,14 +206,28 @@ const AddEditAuditPlan = () => {
       const apiEndpoint = auditplanid
         ? API.UPDATE_SPECIFIC_AUDITPLAN(auditplanid)
         : API.POST_AUDITPLAN_API;
-      const method = auditplanid ? axios.put : axios.post;
-      const response = await method(apiEndpoint, {
-        ...auditPlan,
-        auditees: auditPlan.auditees.map((tag) => tag.text).join(","),
-        assessmentid: assessmentId,
-        user_id: userId,
-        projectdetailsid: projectId,
-        projectname: project,
+
+      const formData = new FormData();
+      formData.append("photo", file); // Append the photo file
+      formData.append("auditor", auditor);
+      formData.append(
+        "auditees",
+        auditPlan.auditees.map((tag) => tag.text).join(",")
+      );
+      formData.append("auditscope", auditscope);
+      formData.append("auditorcompany", auditorcompany);
+      formData.append("fromdate", fromdate);
+      formData.append("todate", todate);
+      formData.append("certificatescope", certificatescope);
+      formData.append("assessmentid", assessmentId);
+      formData.append("user_id", userId);
+      formData.append("projectdetailsid", projectId);
+      formData.append("projectname", project);
+
+      const response = await axios.post(apiEndpoint, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       if (response.status === 200) {
@@ -217,12 +245,13 @@ const AddEditAuditPlan = () => {
           500
         );
       } else {
-        toast.error("Failed to save Audit .");
+        toast.error("Failed to save Audit.");
       }
     } catch (err) {
       toast.error("An error occurred: " + err.message);
     }
   };
+
   return (
     <div className="evidence-page">
       {/* Uncomment Navbar if needed */}
@@ -466,6 +495,25 @@ const AddEditAuditPlan = () => {
                     className="add-edit-project-input"
                   />
                 </div>
+
+                <div>
+                  <label
+                    className="add-edit-project-label"
+                    htmlFor="certificatescope"
+                  >
+                    Certificate Scope
+                  </label>
+                  <textarea
+                    style={{ height: "45px" }}
+                    type="text"
+                    id="certificatescope"
+                    name="certificatescope"
+                    placeholder="Enter Scope of Certificate"
+                    value={auditPlan.certificatescope}
+                    onChange={handleInputChange}
+                    className="add-edit-project-input"
+                  />
+                </div>
                 <div>
                   <label className="add-edit-project-label" htmlFor="fromdate">
                     Audit Start Date
@@ -493,6 +541,19 @@ const AddEditAuditPlan = () => {
                       auditPlan.todate ? auditPlan.todate.split("T")[0] : ""
                     } // Format date for input field
                     onChange={handleInputChange}
+                    className="add-edit-project-input"
+                  />
+                </div>
+                <div>
+                  <label className="add-edit-project-label" htmlFor="photo">
+                    Upload Auditor Company Logo
+                  </label>
+                  <input
+                    type="file"
+                    id="photo"
+                    name="photo"
+                    accept="image/*"
+                    onChange={handleFileChange} // Handle file change
                     className="add-edit-project-input"
                   />
                 </div>

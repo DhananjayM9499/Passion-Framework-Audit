@@ -25,90 +25,83 @@
 // }
 
 // export default Test;
-import React, { useCallback, useRef, useState } from "react";
-import ReactTags from "react-tag-autocomplete";
-
-function TagComponent({ tag, removeButtonText, onDelete }) {
+import React from "react";
+import "./test.css";
+import logo from "../components/images/logo.png";
+const PassionAuditFrameworkComponent = (props) => {
   return (
-    <button
-      type="button"
-      title={`${removeButtonText}: ${tag.name}`}
-      onClick={onDelete}
-      style={{
-        margin: "5px",
-        padding: "5px",
-        backgroundColor: "#f0f0f0",
-        border: "1px solid #ccc",
-      }}
-    >
-      {tag.name} &times;
-    </button>
-  );
-}
+    <div className="container border border-black border-3  pb-0">
+      {/* Header */}
+      <div className="row align-items-center p-3 border-bottom border-4 border-dark">
+        <div className="col-3 text-center">
+          <img src={logo} alt="Logo" style={{ width: "100px" }} />{" "}
+          {/* Replace with your logo */}
+        </div>
+        <div className="col-6 text-center">
+          <h1 className="text-danger fw-bold">Passion Audit Framework</h1>
+        </div>
+        <div className="col-3 text-end">
+          <img src={logo} alt="Second Logo" style={{ width: "80px" }} />{" "}
+          {/* Replace with second logo */}
+        </div>
+      </div>
+      {/* Content Section */}
+      <div className="row mt-3">
+        <div className="col-md-6 p-0">
+          <div className="row m-0 border-cell">
+            <div className="col-4 fw-bold border-cell pa-b">Company Name</div>
+            <div className="col-8 text-muted fw-medium border-cell pa-b">
+              organization
+            </div>
+          </div>
+          <div className="row m-0 border-cell">
+            <div className="col-4 fw-bold border-cell pa-b">
+              Auditor Company
+            </div>
+            <div className="col-8 text-muted fw-medium border-cell pa-b">
+              company name
+            </div>
+          </div>
+          <div className="row m-0 border-cell">
+            <div className="col-4 fw-bold border-cell pa-b">Certified For</div>
+            <div className="col-8 text-muted fw-medium border-cell pa-b">
+              Company Name
+            </div>
+          </div>
+          <div className="row m-0 border-cell">
+            <div className="col-4 fw-bold border-cell pa-b">
+              Audit Framework
+            </div>
+            <div className="col-8 text-muted fw-medium border-cell pa-b">
+              Framework
+            </div>
+          </div>
+          <div className="row m-0 border-cell">
+            <div className="col-4 fw-bold border-cell pa-b">Expiry Date</div>
+            <div className="col-8 text-muted fw-medium border-cell pa-b">
+              Expiry date
+            </div>
+          </div>
+        </div>
 
-function SuggestionComponent({ item }) {
-  return (
-    <div style={{ padding: "5px", borderBottom: "1px solid #eee" }}>
-      {item.name}
+        {/* Right Column: Ratings */}
+        <div className="col-md-6">
+          <div className="row">
+            <div className="col-12 text-center border-cell border-3 p-3">
+              <p className="fw-bold text-start">Assessment Rating</p>
+              <h1 className="display-1">4/5</h1>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-12 text-center border-cell border-3 p-3">
+              <p className="fw-bold text-start">Audit Rating</p>
+              <h1 className="display-1">5/5</h1>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
-}
+};
 
-function Test() {
-  // State for managing auditees tags
-  const [auditees, setAuditees] = useState([]);
-
-  // State for managing suggestions
-  const [suggestions, setSuggestions] = useState([
-    { id: 1, name: "John Doe" },
-    { id: 2, name: "Jane Smith" },
-    { id: 3, name: "Michael Johnson" },
-    { id: 4, name: "Emily Davis" },
-    { id: 5, name: "David Brown" },
-    { id: 6, name: "Sarah Wilson" },
-  ]);
-
-  const reactTags = useRef();
-
-  const onDelete = useCallback(
-    (tagIndex) => {
-      setAuditees(auditees.filter((_, i) => i !== tagIndex));
-    },
-    [auditees]
-  );
-
-  const onAddition = useCallback(
-    (newTag) => {
-      setAuditees([...auditees, newTag]);
-    },
-    [auditees]
-  );
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Handle form submission logic here
-    console.log("Auditees:", auditees);
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="auditees">Auditees:</label>
-        <ReactTags
-          ref={reactTags}
-          tags={auditees}
-          suggestions={suggestions}
-          onDelete={onDelete}
-          onAddition={onAddition}
-          allowNew={true} // Enable adding new tags
-          allowBackspace={true} // Enable backspace to delete
-          tagComponent={TagComponent} // Custom tag component
-          suggestionComponent={SuggestionComponent} // Custom suggestion component
-        />
-      </div>
-      <button type="submit">Submit</button>
-    </form>
-  );
-}
-
-export default Test;
+export default PassionAuditFrameworkComponent;

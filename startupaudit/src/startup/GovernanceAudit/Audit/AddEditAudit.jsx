@@ -154,6 +154,8 @@ const AddEditAudit = () => {
       auditremark,
       auditstatus,
       auditscore,
+      validityperiod,
+      recomendeddays,
     } = audit;
 
     // Check if required fields are filled
@@ -162,7 +164,9 @@ const AddEditAudit = () => {
       !auditupload ||
       !auditremark ||
       !auditstatus ||
-      !auditscore
+      !auditscore ||
+      !validityperiod ||
+      !recomendeddays
     ) {
       toast.error("Please provide all the required fields");
       return;
@@ -171,9 +175,11 @@ const AddEditAudit = () => {
     // Set auditdate and auditreportexpirydate
     const auditdate = new Date(); // Current date and time
     const auditreportexpirydate = new Date(
-      auditdate.getTime() + 1000 * 24 * 60 * 60 * 1000
+      auditdate.getTime() + audit.validityperiod * 24 * 60 * 60 * 1000
     ); // 1000 days from the current date
-
+    const nextauditdate = new Date(
+      auditdate.getTime() + audit.recomendeddays * 24 * 60 * 60 * 1000
+    );
     try {
       const apiEndpoint = governanceauditid
         ? API.UPDATE_SPECIFIC_AUDIT(governanceauditid)
@@ -185,6 +191,7 @@ const AddEditAudit = () => {
         ...audit,
         auditdate,
         auditreportexpirydate,
+        nextauditdate,
         assessmentid: assessmentId,
         user_id: userId,
         auditplanid: auditPlanId,
@@ -497,6 +504,40 @@ const AddEditAudit = () => {
                     onChange={handleInputChange}
                     className="add-edit-project-input"
                     placeholder="Enter audit score"
+                  />
+                </div>
+                <div>
+                  <label
+                    className="add-edit-project-label"
+                    htmlFor="validityperiod"
+                  >
+                    Audit Validity Day(s)
+                  </label>
+                  <input
+                    type="number"
+                    id="validityperiod"
+                    name="validityperiod"
+                    value={audit.validityperiod}
+                    onChange={handleInputChange}
+                    className="add-edit-project-input"
+                    placeholder="Enter audit validity days"
+                  />
+                </div>
+                <div>
+                  <label
+                    className="add-edit-project-label"
+                    htmlFor="recomendeddays"
+                  >
+                    Next Audit Recomended Day(s)
+                  </label>
+                  <input
+                    type="number"
+                    id="recomendeddays"
+                    name="recomendeddays"
+                    value={audit.recomendeddays}
+                    onChange={handleInputChange}
+                    className="add-edit-project-input"
+                    placeholder="Enter next audit days"
                   />
                 </div>
               </div>
