@@ -380,83 +380,56 @@ const AuditRatings = () => {
                 ))}
               </select>
             </div>
+            <div>
+              <label>Governance Name:</label>
+              <select
+                style={{ fontFamily: "Poppins" }}
+                id="groupname"
+                name="groupname"
+                value={state.groupname}
+                onChange={handleInputChange}
+                className="add-edit-project-input"
+              >
+                {" "}
+                <option value="">Group Name</option>
+                {filterUniqueGroupNames(groupname).map((grpname) => (
+                  <option key={grpname.resultid} value={grpname.groupname}>
+                    {grpname.groupname}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div className="add-edit-project-input">
-              <label>From Date:</label>
-              <input
-                type="date"
-                id="fromDate"
-                name="fromDate"
-                value={state.fromDate}
-                onChange={handleInputChange}
-                className="add-edit-project-input"
-              />
-
-              <label>To Date:</label>
-              <input
-                type="date"
-                id="toDate"
-                name="toDate"
-                value={state.toDate}
-                onChange={handleInputChange}
-                className="add-edit-project-input"
-              />
-            </div>
-          </div>
-          <div className="add-edit-project-grid">
-            <label>
-              <h4>Governance Name:</h4>
-            </label>
-            <select
-              style={{ fontFamily: "Poppins" }}
-              id="groupname"
-              name="groupname"
-              value={state.groupname}
-              onChange={handleInputChange}
-              className="add-edit-project-input"
-            >
-              {" "}
-              <option value="">Group Name</option>
-              {filterUniqueGroupNames(groupname).map((grpname) => (
-                <option key={grpname.resultid} value={grpname.groupname}>
-                  {grpname.groupname}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div
-            style={{
-              marginRight: "100px",
-              marginLeft: "50px",
-              marginBottom: "5px",
-              marginTop: "2px",
-              padding: "0px",
-              display: "grid",
-              gridTemplateColumns: "repeat(4, 1fr)",
-              gap: "10px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <label>Max Control Weight</label>
-              <input
-                type="text"
-                id="controlweight"
-                name="controlweight"
-                value={state.controlweight}
-                onChange={handleInputChange}
-                className="add-edit-project-input"
-              />
-            </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <label>Sub Control Weight</label>
-              <input
-                type="text"
-                id="subcontrolweight"
-                name="subcontrolweight"
-                value={state.subcontrolweight}
-                onChange={handleInputChange}
-                className="add-edit-project-input"
-              />
+              <div
+                style={{
+                  flexDirection: "row",
+                }}
+              >
+                {" "}
+                <div>
+                  <label>From Date:</label>
+                  <input
+                    type="date"
+                    id="fromDate"
+                    name="fromDate"
+                    value={state.fromDate}
+                    onChange={handleInputChange}
+                    className="add-edit-project-input"
+                  />
+                </div>
+                <div>
+                  {" "}
+                  <label>To Date:</label>
+                  <input
+                    type="date"
+                    id="toDate"
+                    name="toDate"
+                    value={state.toDate}
+                    onChange={handleInputChange}
+                    className="add-edit-project-input"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </form>
@@ -512,6 +485,10 @@ const AuditRatings = () => {
                           {
                             label: "Audit Framework :",
                             value: item.governancegroup,
+                          },
+                          {
+                            label: "Audit Date",
+                            value: formatDate(item.auditdate),
                           },
                           {
                             label: "Expiry Date :",

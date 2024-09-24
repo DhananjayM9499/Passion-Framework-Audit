@@ -147,6 +147,7 @@ function Navbar() {
     "/auditplan/add": "Audit plan",
     "/auditplan/:auditplanid": "Audit Plan",
     "/auditscore": "Audit Score",
+    "/auditratings": "Audit Ratings",
   };
 
   const activeRoute = routeNames[location.pathname] || "Home";
